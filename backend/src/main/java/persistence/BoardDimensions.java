@@ -2,7 +2,7 @@ package persistence;
 
 public class BoardDimensions {
 
-    public static BoardDimensions DEFAULT = new BoardDimensions(4, 4);
+    public static BoardDimensions DEFAULT = new BoardDimensions(2, 2);
 
     private final int xMaximum;
     private final int yMaximum;
@@ -18,5 +18,9 @@ public class BoardDimensions {
 
     public int getYMaximum() {
         return yMaximum;
+    }
+
+    public int getSizeInBytes() {
+        return xMaximum * yMaximum * Board.BYTES_PER_COLOR;
     }
 }
