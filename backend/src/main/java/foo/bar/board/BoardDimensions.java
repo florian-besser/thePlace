@@ -1,5 +1,7 @@
 package foo.bar.board;
 
+import persistence.RedisStore;
+
 public class BoardDimensions {
 
     public static BoardDimensions DEFAULT = new BoardDimensions(2, 2);
@@ -21,6 +23,6 @@ public class BoardDimensions {
     }
 
     public int getSizeInBytes() {
-        return xMaximum * yMaximum * persistence.Board.BYTES_PER_COLOR;
+        return xMaximum * yMaximum * RedisStore.BYTES_PER_COLOR;
     }
 }

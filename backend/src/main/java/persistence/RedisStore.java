@@ -16,14 +16,19 @@ public class RedisStore {
     public static final int SECONDS = 300;
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+    public static int BYTES_PER_COLOR = 3;
 
     public RedisStore() {
+    }
+
+    private static int calculateOffset(BoardDimensions dimensions, int x, int y) {
+        return (y * dimensions.getXMaximum() + x) * BYTES_PER_COLOR;
     }
 
     public void setPixel(BoardDimensions dimensions, int x, int y, Color color) {
         try (Jedis jedis = pool.getResource()) {
             initBoardIfNotExists(jedis, dimensions);
-            int offset = Board.calculateOffset(dimensions, x, y) * 8;
+            int offset = calculateOffset(dimensions, x, y) * 8;
             int i = color.getRGB() & 0xffffff;
 //        System.out.println(offset + " " + i);
             jedis.bitfield("colors", "set", "u24", offset + "", i + "");
@@ -45,18 +50,20 @@ public class RedisStore {
         }
     }
 
-    //Test Only
-    public Board getBoard() {
-        try (Jedis jedis = pool.getResource()) {
-            byte[] colors = jedis.get(encode("colors"));
-            return new Board(BoardDimensions.DEFAULT, colors);
-        }
-    }
-
     public Color[][] getBoardColors(BoardDimensions boardDimensions) {
         try (Jedis jedis = pool.getResource()) {
-            byte[] colors = jedis.get(encode("colors"));
-            return new Board(boardDimensions, colors).getColors();
+            byte[] colorsInBytes = jedis.get(encode("colors"));
+            int yMax = boardDimensions.getYMaximum();
+            int xMax = boardDimensions.getXMaximum();
+            Color[][] colors = new Color[xMax][yMax];
+            for (int y = 0; y < yMax; y++) {
+                for (int x = 0; x < xMax; x++) {
+                    int offset = calculateOffset(boardDimensions, x, y);
+                    Color color = new Color(colorsInBytes[offset] & 0xff, colorsInBytes[offset + 1] & 0xff, colorsInBytes[offset + 2] & 0xff);
+                    colors[x][y] = color;
+                }
+            }
+            return colors;
         }
     }
 
