@@ -18,7 +18,11 @@ public class Board {
     public static Board THE_BOARD = new Board(4, 4);
 
     // [Y][X]
-    private final SimpleColor[][] colors;
+    private SimpleColor[][] colors;
+
+    private Board() {
+        // Used by Jackson
+    }
 
     private Board(int xMaximum, int yMaximum) {
         BoardDimensions boardDimensions = new BoardDimensions(xMaximum, yMaximum);
@@ -29,17 +33,14 @@ public class Board {
         this.colors = redisStore.getBoardColors(boardDimensions);
     }
 
-    public int getXMaximum() {
-        return colors[0].length;
-    }
-
     // Used by Jackson
     public SimpleColor[][] getColors() {
         return colors;
     }
 
-    public int getYMaximum() {
-        return colors.length;
+    // Used by Jackson
+    public void setColors(SimpleColor[][] colors) {
+        this.colors = colors;
     }
 
     public void setPixel(Pixel toSet) {

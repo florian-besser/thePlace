@@ -61,7 +61,10 @@ public class Resource {
                     build();
         }
         Board board = Board.THE_BOARD;
-        if (x < 0 || y < 0 || x >= board.getXMaximum() || y >= board.getYMaximum()) {
+        SimpleColor[][] colors = board.getColors();
+        int xMax = colors[0].length;
+        int yMax = colors.length;
+        if (x < 0 || y < 0 || x >= xMax || y >= yMax) {
             return Response.
                     status(Response.Status.BAD_REQUEST).
                     entity("X or Y out of bounds").
@@ -78,7 +81,8 @@ public class Resource {
 
         LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
                 " with Color " + body.getColor() + " for user " + body.getUser());
-        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(body.getColor()));
+        BoardDimensions dimensions = new BoardDimensions(xMax, yMax);
+        redisStore.setPixel(dimensions, x, y, Color.decode(body.getColor()));
 
         // Send message
         new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(body.getColor()))));
