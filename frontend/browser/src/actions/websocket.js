@@ -6,7 +6,7 @@ const socket = new WebSocket(socket_url);
 
 
 export const init = (store) => {
-    socket.onmessage = (data) => {
-        store.dispatch(pixelUpdated(data))
+    socket.onmessage = (msg) => {
+        store.dispatch(pixelUpdated(JSON.parse(msg.data)))
     };
 };

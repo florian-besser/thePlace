@@ -27,14 +27,18 @@ export function setPickerColor(color) {
 export function setColor(x, y, color) {
     return (dispatch, getState) => {
         dispatch(setColorRequested(x, y, color));
-        const body = {
-            user: getState().user.userId,
-            color: color
-        };
-        const requestOptions = {method: 'put', body};
-        return fetch(API_ENDPOINT + `/place/${x}/${y}`, requestOptions)
-            .then(response => response.json())
-            .then(json => dispatch(setColorSuccess()));
+        const request = new Request(API_ENDPOINT + `/place/${x}/${y}`, {
+            method: 'put',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify({
+                user: getState().user.userId,
+                color: color
+            })
+        });
+        return fetch(request)
+            .then(response => dispatch(setColorSuccess()));
     };
 }
 
