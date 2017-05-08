@@ -1,29 +1,35 @@
 import * as React from 'react';
 import {connect} from 'react-redux';
-import { SketchPicker } from 'react-color';
+import {ChromePicker} from 'react-color';
 import {setColor, selectPixel, setPickerColor} from '../actions';
 
 
 const PIXEL_SIZE = 10;
 
 function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor}) {
-    const width = board.xmaximum;
-    const height = board.ymaximum;
+    const width = board.colors[0] ? board.colors[0].length : 0;
+    const height = board.colors.length;
     const selectedPixel = board.selectedPixel;
+    const tiles = [];
+
+    board.colors.forEach((line, y) => {
+        line.forEach((tile, x) => {
+            const isSelected = selectedPixel.x === x && selectedPixel.y === y;
+            tiles.push(
+                <Tile
+                    color={tile.color}
+                    key={`${x}-${y}`}
+                    selected={isSelected}
+                    onSelect={() => onSelectPixel(x, y, tile.color)}
+                />
+            );
+        });
+    });
+
     return (
         <div>
             <div className='place' style={{width: width * PIXEL_SIZE, height: height * PIXEL_SIZE}}>
-                {board.pixels.map(t => {
-                    const isSelected = selectedPixel.x === t.x && selectedPixel.y === t.y;
-                    return (
-                        <Tile
-                            color={t.color}
-                            key={`${t.x}-${t.y}`}
-                            selected={isSelected}
-                            onSelect={() => onSelectPixel(t.x, t.y, '#' + t.color)}
-                        />
-                    )
-                })}
+                {tiles}
             </div>
             <ColorSelector
                 x={selectedPixel.x}
@@ -41,7 +47,7 @@ function Tile({color, selected, onSelect}) {
     return (
         <div
             className={classes}
-            style={{backgroundColor: `#${color}`}}
+            style={{backgroundColor: `${color}`}}
             onClick={onSelect}
         />
     );
@@ -60,7 +66,7 @@ function ColorSelector({x, y, color, setPickerColor, onSetColor}) {
     return (
         <div className='colorActions'>
             <p>Setting color for pixel {`${x}/${y}`} to {color}</p>
-            <SketchPicker onChangeComplete={setPickerColor} color={color}/>
+            <ChromePicker disableAlpha onChangeComplete={setPickerColor} color={color}/>
             <button onClick={() => onSetColor(x, y, color)}>Save</button>
         </div>
     );

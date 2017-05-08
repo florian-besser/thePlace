@@ -15,7 +15,7 @@ import java.util.Set;
 public class Board {
     private static final Logger LOGGER = LoggerFactory.getLogger(Board.class);
 
-    public static Board THE_BOARD = new Board(4, 4);
+    public static Board THE_BOARD = new Board(50, 50);
 
     // [Y][X]
     private final SimpleColor[][] colors;
