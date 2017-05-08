@@ -7,7 +7,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.util.SafeEncoder;
 
-
 import static redis.clients.util.SafeEncoder.encode;
 
 public class RedisStore {
@@ -29,7 +28,7 @@ public class RedisStore {
         try (Jedis jedis = pool.getResource()) {
             initBoardIfNotExists(jedis, dimensions);
             int offset = calculateOffset(dimensions, x, y) * 8;
-            String color1 = color.getColor();
+            String color1 = color.getColor().substring(1);
             int i = Integer.parseInt(color1, 16);
 //        System.out.println(offset + " " + i);
             jedis.bitfield("colors", "set", "u24", offset + "", i + "");
