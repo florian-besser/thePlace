@@ -1,24 +1,30 @@
 package foo.bar.websocket;
+
+import foo.bar.rest.Resource;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class EventSocket extends WebSocketAdapter
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
+
     @Override
     public void onWebSocketConnect(Session sess)
     {
         super.onWebSocketConnect(sess);
-        System.out.println("Socket Connected: " + sess);
+        LOGGER.info("Socket Connected: " + sess);
     }
 
     @Override
     public void onWebSocketText(String message)
     {
         super.onWebSocketText(message);
-        System.out.println("Received TEXT message: " + message);
+        LOGGER.info("Received TEXT message: " + message);
     }
 
     @Override
@@ -26,7 +32,7 @@ public class EventSocket extends WebSocketAdapter
     {
         super.onWebSocketClose(statusCode,reason);
         PooledSessionCreator.remove(this);
-        System.out.println("Socket Closed: [" + statusCode + "] " + reason);
+        LOGGER.info("Socket Closed: [" + statusCode + "] " + reason);
     }
 
     @Override
@@ -37,7 +43,7 @@ public class EventSocket extends WebSocketAdapter
     }
 
     public void sendMessage(String text) {
-        System.out.println("Sending message: " + text);
+        LOGGER.info("Sending message: " + text);
         Future<Void> voidFuture = getRemote().sendStringByFuture(text);
         //Do something
         try {
@@ -45,6 +51,6 @@ public class EventSocket extends WebSocketAdapter
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("Sent message: " + text);
+        LOGGER.info("Sent message: " + text);
     }
 }

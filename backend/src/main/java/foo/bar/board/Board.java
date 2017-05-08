@@ -4,13 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
-import persistence.BoardDimensions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.RedisStore;
 
-import java.awt.*;
 import java.util.Set;
 
 public class Board {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Board.class);
 
     public static Board DEFAULT = new Board(4, 4);
 
@@ -31,7 +32,7 @@ public class Board {
             int x = i % xMaximum;
             int y = i / xMaximum;
             String color = "000000";
-            System.out.println("Creating Pixel at " + x + " " + y + " with Color " + color);
+            LOGGER.info("Creating Pixel at " + x + " " + y + " with Color " + color);
             pixels[i] = new Pixel(x, y, color);
         }
     }
@@ -48,19 +49,9 @@ public class Board {
         return pixels;
     }
 
-    public void setPixel(Pixel toSet, String user) {
-        if (!isAllowed(user)) {
-            System.out.println("NOT updating Pixel at " + toSet.getX() + " " + toSet.getY() +
-                    " with Color " + toSet.getColor() + " for user " + user);
-            return;
-        }
-
-        System.out.println("Updating Pixel at " + toSet.getX() + " " + toSet.getY() +
-                " with Color " + toSet.getColor() + " for user " + user);
-
-        redisStore.setPixel(new BoardDimensions(xMaximum, yMaximum), toSet.getX(), toSet.getY(), Color.decode(toSet.getColor()));
-        // Forbid user to change more Pixels for 5 minutes
-        redisStore.userHasSetPixel(user);
+    public void setPixel(Pixel toSet) {
+        LOGGER.info("Updating Pixel LOCALLY at " + toSet.getX() + " " + toSet.getY() +
+                " with Color " + toSet.getColor());
 
         // Change actual Pixel color
         int index = toSet.getX() + toSet.getY() * xMaximum;
@@ -70,10 +61,6 @@ public class Board {
         Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
         String toSetStr = serialize(toSet);
         websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
-    }
-
-    private boolean isAllowed(String user) {
-        return redisStore.isUserAllowed(user);
     }
 
     private String serialize(Pixel toSet) {

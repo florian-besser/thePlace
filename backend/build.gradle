@@ -27,6 +27,9 @@ dependencies {
     //RabbitMQ
     compile 'com.rabbitmq:amqp-client:4.1.0'
 
+    // Logback for log output
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
     // Redis client
     compile 'redis.clients:jedis:2.9.0'
 }

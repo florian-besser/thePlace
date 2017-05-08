@@ -1,17 +1,30 @@
 package foo.bar.rest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.Board;
 import foo.bar.board.Pixel;
+import foo.bar.mq.MessageSender;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import persistence.BoardDimensions;
+import persistence.RedisStore;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.awt.*;
 import java.util.Set;
 
 @Path("thePlace")
 public class Resource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
+
+    private final RedisStore redisStore = new RedisStore();
+
     @GET
     @Path("hello")
     @Produces(MediaType.TEXT_PLAIN)
@@ -37,12 +50,50 @@ public class Resource {
 
     @PUT
     @Path("place/{x}/{y}")
-    public void putPixel(@PathParam("x") int x, @PathParam("y") int y,
-                         @NotNull @QueryParam("color") String color,
-                         @NotNull @QueryParam("user") String user) {
+    public Response putPixel(@PathParam("x") int x, @PathParam("y") int y,
+                             @NotNull @QueryParam("color") String color,
+                             @NotNull @QueryParam("user") String user) {
         if (color == null || user == null) {
-            throw new RuntimeException("Color and User must not be null!");
+            return Response.
+                    status(Response.Status.BAD_REQUEST).
+                    entity("Color and User must not be null!").
+                    build();
         }
-        Board.DEFAULT.setPixel(new Pixel(x, y, color), user);
+        Board board = Board.DEFAULT;
+        if (x < 0 || y < 0 || x >= board.getXMaximum() || y >= board.getYMaximum()) {
+            return Response.
+                    status(Response.Status.BAD_REQUEST).
+                    entity("X or Y out of bounds").
+                    build();
+        }
+
+        // Check Redis to see if User is allowed
+        if (!redisStore.isUserAllowed(user)) {
+            return Response.
+                    status(Response.Status.BAD_REQUEST).
+                    entity("User is not allowed").
+                    build();
+        }
+
+        // Forbid user to change more Pixels for 5 minutes
+        redisStore.userHasSetPixel(user);
+        LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
+                " with Color " + color + " for user " + user);
+        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(color));
+
+        // Send message
+        new MessageSender().sendMessage(serialize(new Pixel(x, y, color)));
+        return Response.ok().build();
+    }
+
+    private String serialize(Pixel toSet) {
+        ObjectMapper mapper = new ObjectMapper();
+        String toSetStr;
+        try {
+            toSetStr = mapper.writeValueAsString(toSet);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error wile converting Pixel to String.", e);
+        }
+        return toSetStr;
     }
 }
