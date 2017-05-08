@@ -50,13 +50,15 @@ public class RedisStore {
         return new Board(boardDimensions, colors).getColors();
     }
 
-    public boolean isUserAllowed(String userId) {
-        return jedis.ttl("user_" + userId) < 0;
-    }
-
-    public void userHasSetPixel(String userId) {
-        jedis.set("user_" + userId, "asdf");
-        jedis.expire("user_" + userId, SECONDS);
+    public boolean tryToSetPixel(String userId) {
+        String key = "user_" + userId;
+        Long setnx = jedis.setnx(key, "user set pixel");
+        if (setnx == 0) {
+            return false;
+        } else {
+            jedis.expire(key, SECONDS);
+            return true;
+        }
     }
 
 }
