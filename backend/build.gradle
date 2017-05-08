@@ -24,6 +24,9 @@ dependencies {
     //Manual test WS client
     testCompile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.5.v20170502'
 
+    //RabbitMQ
+    compile 'com.rabbitmq:amqp-client:4.1.0'
+
     // Redis client
     compile 'redis.clients:jedis:2.9.0'
 }
