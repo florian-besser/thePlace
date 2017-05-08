@@ -80,6 +80,7 @@
     <dictionary name="cicd">
       <words>
         <w>websocket</w>
+        <w>websockets</w>
       </words>
     </dictionary>
   </component>

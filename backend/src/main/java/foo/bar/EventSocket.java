@@ -2,6 +2,9 @@ package foo.bar;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 public class EventSocket extends WebSocketAdapter
 {
     @Override
@@ -22,6 +25,7 @@ public class EventSocket extends WebSocketAdapter
     public void onWebSocketClose(int statusCode, String reason)
     {
         super.onWebSocketClose(statusCode,reason);
+        PooledSessionCreator.remove(this);
         System.out.println("Socket Closed: [" + statusCode + "] " + reason);
     }
 
@@ -30,5 +34,17 @@ public class EventSocket extends WebSocketAdapter
     {
         super.onWebSocketError(cause);
         cause.printStackTrace(System.err);
+    }
+
+    public void sendMessage(String text) {
+        System.out.println("Sending message: " + text);
+        Future<Void> voidFuture = getRemote().sendStringByFuture(text);
+        //Do something
+        try {
+            voidFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Sent message: " + text);
     }
 }

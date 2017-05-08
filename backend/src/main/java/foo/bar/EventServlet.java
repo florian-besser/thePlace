@@ -8,6 +8,10 @@ public class EventServlet extends WebSocketServlet
     @Override
     public void configure(WebSocketServletFactory factory)
     {
-        factory.register(EventSocket.class);
+        // set a 1 hour timeout
+        factory.getPolicy().setIdleTimeout(1000 * 60 * 60);
+
+        // set a custom WebSocket creator
+        factory.setCreator(new PooledSessionCreator());
     }
 }

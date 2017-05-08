@@ -1,10 +1,10 @@
 package foo.bar;
 
-import java.net.URI;
-import java.util.concurrent.Future;
-
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
+
+import java.net.URI;
+import java.util.concurrent.Future;
 
 public class EventClient
 {
@@ -24,8 +24,15 @@ public class EventClient
                 Future<Session> fut = client.connect(socket,uri);
                 // Wait for Connect
                 Session session = fut.get();
+
                 // Send a message
                 session.getRemote().sendString("Hello");
+
+                // Wait until the server disconnects
+                while (socket.isConnected()) {
+                    Thread.sleep(1000);
+                }
+
                 // Close session
                 session.close();
             }
