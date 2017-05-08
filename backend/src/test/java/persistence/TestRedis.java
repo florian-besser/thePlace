@@ -24,7 +24,7 @@ public class TestRedis {
         for (int x = 0; x < boardDimensions.getXMaximum(); x++) {
             for (int y = 0; y < boardDimensions.getYMaximum(); y++) {
                 System.out.println("pixel " + x + " " + y);
-                redisInterface.setPixel(boardDimensions, x, y, Color.blue);
+                redisInterface.setPixel(boardDimensions, x, y, new SimpleColor("0000ff"));
                 SimpleColor[][] boardColors = redisInterface.getBoardColors(boardDimensions);
                 for (SimpleColor[] colors : boardColors) {
                     for (SimpleColor c : colors) {

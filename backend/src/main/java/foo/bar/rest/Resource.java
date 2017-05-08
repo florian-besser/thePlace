@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.awt.*;
 import java.util.Set;
 
 @Path("thePlace")
@@ -78,10 +77,11 @@ public class Resource {
 
         LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
                 " with Color " + body.getColor() + " for user " + body.getUser());
-        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(body.getColor()));
+        SimpleColor color = new SimpleColor(body.getColor());
+        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, color);
 
         // Send message
-        new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(body.getColor()))));
+        new MessageSender().sendMessage(serialize(new Pixel(x, y, color)));
         return Response.ok().build();
     }
 
