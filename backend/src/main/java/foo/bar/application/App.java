@@ -1,5 +1,6 @@
-package foo.bar;
+package foo.bar.application;
 
+import foo.bar.websocket.EventServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;

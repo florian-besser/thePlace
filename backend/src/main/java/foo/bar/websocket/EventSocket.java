@@ -1,4 +1,4 @@
-package foo.bar;
+package foo.bar.websocket;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 

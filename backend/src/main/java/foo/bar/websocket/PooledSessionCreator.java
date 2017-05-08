@@ -1,4 +1,4 @@
-package foo.bar;
+package foo.bar.websocket;
 
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;

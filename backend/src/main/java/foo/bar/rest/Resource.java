@@ -1,4 +1,7 @@
-package foo.bar;
+package foo.bar.rest;
+
+import foo.bar.websocket.EventSocket;
+import foo.bar.websocket.PooledSessionCreator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
