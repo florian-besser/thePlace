@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.Board;
 import foo.bar.board.BoardDimensions;
 import foo.bar.board.Pixel;
+import foo.bar.board.SimpleColor;
 import foo.bar.mq.MessageSender;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
@@ -82,7 +83,7 @@ public class Resource {
         redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(color));
 
         // Send message
-        new MessageSender().sendMessage(serialize(new Pixel(x, y, color)));
+        new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(color))));
         return Response.ok().build();
     }
 

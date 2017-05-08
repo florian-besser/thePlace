@@ -17,15 +17,25 @@ public class Board {
     public static Board THE_BOARD = new Board(4, 4);
 
     // [Y][X]
-    private final Color[][] colors;
+    private final SimpleColor[][] colors;
 
     private Board(int xMaximum, int yMaximum) {
         BoardDimensions boardDimensions = new BoardDimensions(xMaximum, yMaximum);
 
+        this.colors = new SimpleColor[yMaximum][xMaximum];
+
         // Read from Redis
         RedisStore redisStore = new RedisStore();
         redisStore.resetBoard(boardDimensions);
-        this.colors = redisStore.getBoardColors(boardDimensions);
+        Color[][] boardColors = redisStore.getBoardColors(boardDimensions);
+        for (int i = 0; i < boardColors.length; i++) {
+            for (int j = 0; j < boardColors[i].length; j++) {
+                Color color = boardColors[i][j];
+                String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+                this.colors[i][j] = new SimpleColor(hex);
+
+            }
+        }
     }
 
     public int getXMaximum() {
@@ -33,7 +43,7 @@ public class Board {
     }
 
     // Used by Jackson
-    public Color[][] getColors() {
+    public SimpleColor[][] getColors() {
         return colors;
     }
 
@@ -46,7 +56,7 @@ public class Board {
                 " with Color " + toSet.getColor());
 
         // Change actual Pixel color
-        colors[toSet.getY()][toSet.getX()] = Color.decode(toSet.getColor());
+        colors[toSet.getY()][toSet.getX()] = toSet.getColor();
 
         // Update all connected clients
         Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();

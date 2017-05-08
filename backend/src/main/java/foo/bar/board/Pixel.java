@@ -4,16 +4,16 @@ public class Pixel {
 
     private int x;
     private int y;
-    private String color;
+    private SimpleColor color;
 
     public Pixel() {
         // Only to be used from Jackson
     }
 
-    public Pixel(int x, int y, String color) {
+    public Pixel(int x, int y, SimpleColor simpleColor) {
         this.x = x;
         this.y = y;
-        this.color = color;
+        this.color = simpleColor;
     }
 
     public int getX() {
@@ -34,12 +34,12 @@ public class Pixel {
         this.y = y;
     }
 
-    public String getColor() {
+    public SimpleColor getColor() {
         return color;
     }
 
     // Only to be used from Jackson
-    public void setColor(String color) {
+    public void setColor(SimpleColor color) {
         this.color = color;
     }
 }
