@@ -3,8 +3,9 @@
     sudo apt-get install npm
     sudo npm install --global n
     sudo n latest
-    npm install
+    sudo npm install --global yarn
+    yarn install
 
 # Running the app
 
-    npm start
+    yarn start
