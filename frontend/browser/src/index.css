@@ -11,4 +11,15 @@ body {
   display: inline-block;
   width: 10px;
   height: 10px;
+  cursor: pointer;
+}
+
+.place {
+  margin: 20px;
+}
+
+.colorActions {
+  text-align: left;
+  margin: 20px;
+  padding: 20px;
 }

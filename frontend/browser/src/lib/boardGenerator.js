@@ -14,11 +14,11 @@ export function generateRandomBoard(width, height) {
 }
 
 function getRandomColor() {
-    const r = randomInt(0, 255);
-    const g = randomInt(0, 255);
-    const b = randomInt(0, 255);
+    const r = randomInt(0, 255).toString(16);
+    const g = randomInt(0, 255).toString(16);
+    const b = randomInt(0, 255).toString(16);
 
-    return `rgb(${r}, ${g}, ${b})`;
+    return `${r}${g}${b}`;
 }
 
 function randomInt(min, max) {

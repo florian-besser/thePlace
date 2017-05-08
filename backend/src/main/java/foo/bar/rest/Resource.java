@@ -1,5 +1,6 @@
 package foo.bar.rest;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.Board;
@@ -49,12 +50,28 @@ public class Resource {
         return Board.THE_BOARD;
     }
 
+    private static class PutPixelBody {
+        @NotNull
+        private String color;
+
+        @NotNull
+        private String user;
+
+        public String getColor() {
+            return color;
+        }
+
+        public String getUser() {
+            return user;
+        }
+    }
+
     @PUT
     @Path("place/{x}/{y}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response putPixel(@PathParam("x") int x, @PathParam("y") int y,
-                             @NotNull @QueryParam("color") String color,
-                             @NotNull @QueryParam("user") String user) {
-        if (color == null || user == null) {
+                         @NotNull PutPixelBody body) {
+        if (body.getColor() == null || body.getUser() == null) {
             return Response.
                     status(Response.Status.BAD_REQUEST).
                     entity("Color and User must not be null!").
@@ -69,7 +86,7 @@ public class Resource {
         }
 
         // Check for permission for this user to set another pixel, only allowed every 5 minutes
-        if (!redisStore.tryToSetPixel(user)) {
+        if (!redisStore.tryToSetPixel(body.getUser())) {
             return Response.
                     status(Response.Status.BAD_REQUEST).
                     entity("User is not allowed").
@@ -77,11 +94,11 @@ public class Resource {
         }
 
         LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
-                " with Color " + color + " for user " + user);
-        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(color));
+                " with Color " + body.getColor() + " for user " + body.getUser());
+        redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(body.getColor()));
 
         // Send message
-        new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(color))));
+        new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(body.getColor()))));
         return Response.ok().build();
     }
 
