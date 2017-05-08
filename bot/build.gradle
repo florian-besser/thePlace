@@ -5,18 +5,8 @@ repositories {
 }
 
 dependencies {
-    //Jersey for REST
-    compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.25.1'
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.25.1'
-
-    //Jersey to (de-)serialize objects
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.25.1'
-
     //Manual test WS client
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.5.v20170502'
-
-    // Logback for log output
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
 
     compile project(':backend')
 }
