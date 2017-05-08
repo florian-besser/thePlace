@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.RedisStore;
 
-import java.awt.*;
 import java.util.Set;
 
 public class Board {
@@ -22,20 +21,10 @@ public class Board {
     private Board(int xMaximum, int yMaximum) {
         BoardDimensions boardDimensions = new BoardDimensions(xMaximum, yMaximum);
 
-        this.colors = new SimpleColor[yMaximum][xMaximum];
-
         // Read from Redis
         RedisStore redisStore = new RedisStore();
         redisStore.resetBoard(boardDimensions);
-        Color[][] boardColors = redisStore.getBoardColors(boardDimensions);
-        for (int i = 0; i < boardColors.length; i++) {
-            for (int j = 0; j < boardColors[i].length; j++) {
-                Color color = boardColors[i][j];
-                String hex = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-                this.colors[i][j] = new SimpleColor(hex);
-
-            }
-        }
+        this.colors = redisStore.getBoardColors(boardDimensions);
     }
 
     public int getXMaximum() {

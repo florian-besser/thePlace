@@ -1,6 +1,7 @@
 package persistence;
 
 import foo.bar.board.BoardDimensions;
+import foo.bar.board.SimpleColor;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -50,16 +51,21 @@ public class RedisStore {
         }
     }
 
-    public Color[][] getBoardColors(BoardDimensions boardDimensions) {
+    public SimpleColor[][] getBoardColors(BoardDimensions boardDimensions) {
         try (Jedis jedis = pool.getResource()) {
             byte[] colorsInBytes = jedis.get(encode("colors"));
             int yMax = boardDimensions.getYMaximum();
             int xMax = boardDimensions.getXMaximum();
-            Color[][] colors = new Color[xMax][yMax];
+            SimpleColor[][] colors = new SimpleColor[yMax][xMax];
             for (int y = 0; y < yMax; y++) {
                 for (int x = 0; x < xMax; x++) {
                     int offset = calculateOffset(boardDimensions, x, y);
-                    Color color = new Color(colorsInBytes[offset] & 0xff, colorsInBytes[offset + 1] & 0xff, colorsInBytes[offset + 2] & 0xff);
+                    int red = colorsInBytes[offset] & 0xff;
+                    int green = colorsInBytes[offset + 1] & 0xff;
+                    int blue = colorsInBytes[offset + 2] & 0xff;
+                    String hex = String.format("#%02x%02x%02x", red, green, blue);
+
+                    SimpleColor color = new SimpleColor(hex);
                     colors[x][y] = color;
                 }
             }
