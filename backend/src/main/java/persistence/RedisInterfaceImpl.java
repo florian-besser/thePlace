@@ -10,6 +10,7 @@ import static redis.clients.util.SafeEncoder.encode;
 public class RedisInterfaceImpl implements RedisInterface {
 
     public static final String COLORS = "colors";
+    public static final int SECONDS = 300;
     private final Jedis jedis;
 
     public RedisInterfaceImpl() {
@@ -42,5 +43,16 @@ public class RedisInterfaceImpl implements RedisInterface {
     public Board getBoard() {
         byte[] colors = jedis.get(encode("colors"));
         return new Board(BoardDimensions.DEFAULT, colors);
+    }
+
+    @Override
+    public boolean isUserAllowed(String userId) {
+        return jedis.ttl("user_" + userId) < 0;
+    }
+
+    @Override
+    public void userHasSetPixel(String userId) {
+        jedis.set("user_" + userId, "asdf");
+        jedis.expire("user_" + userId, SECONDS);
     }
 }

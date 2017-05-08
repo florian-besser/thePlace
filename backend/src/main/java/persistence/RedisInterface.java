@@ -13,4 +13,7 @@ public interface RedisInterface {
 
     Board getBoard();
 
+    boolean isUserAllowed(String userId);
+
+    void userHasSetPixel(String userId);
 }

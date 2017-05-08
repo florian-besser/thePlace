@@ -13,6 +13,7 @@ public class TestRedis {
 
         System.out.println(jedis.get("colors"));
 
+
         RedisInterfaceImpl redisInterface = new RedisInterfaceImpl();
         redisInterface.resetBoard();
         for (int x = 0; x < BoardDimensions.DEFAULT.getXMaximum(); x++) {
@@ -22,5 +23,10 @@ public class TestRedis {
                 System.out.println(redisInterface.getBoard());
             }
         }
+
+        System.out.println(redisInterface.isUserAllowed("stivo"));
+        redisInterface.userHasSetPixel("stivo");
+        System.out.println(redisInterface.isUserAllowed("stivo"));
+        System.out.println(Color.decode("#ffffff"));
     }
 }
