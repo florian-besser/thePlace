@@ -5,12 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
 import persistence.BoardDimensions;
-import persistence.RedisInterfaceImpl;
+import persistence.RedisStore;
 
 import java.awt.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 public class Board {
@@ -22,10 +19,10 @@ public class Board {
     // HEX Strings
     private final Pixel[] pixels;
 
-    private final RedisInterfaceImpl redisInterface = new RedisInterfaceImpl();
+    private final RedisStore redisStore = new RedisStore();
 
     public Board(int xMaximum, int yMaximum) {
-        redisInterface.resetBoard();
+        redisStore.resetBoard();
         this.xMaximum = xMaximum;
         this.yMaximum = yMaximum;
         this.pixels = new Pixel[xMaximum * yMaximum];
@@ -61,9 +58,9 @@ public class Board {
         System.out.println("Updating Pixel at " + toSet.getX() + " " + toSet.getY() +
                 " with Color " + toSet.getColor() + " for user " + user);
 
-        redisInterface.setPixel(new BoardDimensions(xMaximum, yMaximum), toSet.getX(), toSet.getY(), Color.decode(toSet.getColor()));
+        redisStore.setPixel(new BoardDimensions(xMaximum, yMaximum), toSet.getX(), toSet.getY(), Color.decode(toSet.getColor()));
         // Forbid user to change more Pixels for 5 minutes
-        redisInterface.userHasSetPixel(user);
+        redisStore.userHasSetPixel(user);
 
         // Change actual Pixel color
         int index = toSet.getX() + toSet.getY() * xMaximum;
@@ -76,7 +73,7 @@ public class Board {
     }
 
     private boolean isAllowed(String user) {
-        return redisInterface.isUserAllowed(user);
+        return redisStore.isUserAllowed(user);
     }
 
     private String serialize(Pixel toSet) {

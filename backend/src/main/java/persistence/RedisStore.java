@@ -7,17 +7,16 @@ import java.awt.*;
 
 import static redis.clients.util.SafeEncoder.encode;
 
-public class RedisInterfaceImpl implements RedisInterface {
+public class RedisStore {
 
     public static final String COLORS = "colors";
     public static final int SECONDS = 300;
     private final Jedis jedis;
 
-    public RedisInterfaceImpl() {
+    public RedisStore() {
         this.jedis = new Jedis("localhost");
     }
 
-    @Override
     public void setPixel(BoardDimensions dimensions, int x, int y, Color color) {
         initBoardIfNotExists(dimensions);
         int offset = Board.calculateOffset(dimensions, x, y) * 8;
@@ -34,23 +33,19 @@ public class RedisInterfaceImpl implements RedisInterface {
         }
     }
 
-    @Override
     public void resetBoard() {
         jedis.del(COLORS);
     }
 
-    @Override
     public Board getBoard() {
         byte[] colors = jedis.get(encode("colors"));
         return new Board(BoardDimensions.DEFAULT, colors);
     }
 
-    @Override
     public boolean isUserAllowed(String userId) {
         return jedis.ttl("user_" + userId) < 0;
     }
 
-    @Override
     public void userHasSetPixel(String userId) {
         jedis.set("user_" + userId, "asdf");
         jedis.expire("user_" + userId, SECONDS);

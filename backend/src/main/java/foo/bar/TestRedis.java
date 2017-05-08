@@ -1,7 +1,7 @@
 package foo.bar;
 
 import persistence.BoardDimensions;
-import persistence.RedisInterfaceImpl;
+import persistence.RedisStore;
 import redis.clients.jedis.Jedis;
 
 import java.awt.*;
@@ -14,7 +14,7 @@ public class TestRedis {
         System.out.println(jedis.get("colors"));
 
 
-        RedisInterfaceImpl redisInterface = new RedisInterfaceImpl();
+        RedisStore redisInterface = new RedisStore();
         redisInterface.resetBoard();
         for (int x = 0; x < BoardDimensions.DEFAULT.getXMaximum(); x++) {
             for (int y = 0; y < BoardDimensions.DEFAULT.getYMaximum(); y++) {
