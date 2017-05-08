@@ -1,14 +1,13 @@
-import uuid from '../lib/uuid';
-import {generateRandomBoard} from '../lib/boardGenerator';
-import {combineReducers} from 'redux';
-import * as ActionTypes from '../actions/actionTypes';
+import uuid from "../lib/uuid";
+import {combineReducers} from "redux";
+import * as ActionTypes from "../actions/actionTypes";
 
 const BOARD_WIDTH = 50;
 const BOARD_HEIGHT = 50;
 
 const initialBoardState = {
     isFetching: false,
-    pixels: generateRandomBoard(BOARD_WIDTH, BOARD_HEIGHT),
+    colors: [],  // generateRandomBoard(BOARD_WIDTH, BOARD_HEIGHT),
     xmaximum: BOARD_WIDTH,
     ymaximum: BOARD_HEIGHT,
     updatePending: false,
@@ -37,12 +36,11 @@ function board(state = initialBoardState, action) {
                 updatePending: false
             };
         case ActionTypes.PIXEL_UPDATED:
-            const indexToUpdate = action.y * state.xmaximum + action.x;
-            const updatedPixels = [...state.pixels];
-            updatedPixels[indexToUpdate] = action.color;
+            const updatedPixels = [...state.colors];
+            updatedPixels[action.y][action.x] = action.color;
             return {
                 ...state,
-                pixels: updatedPixels
+                colors: updatedPixels
             };
         case ActionTypes.REQUEST_PLACE:
             return {
@@ -53,9 +51,9 @@ function board(state = initialBoardState, action) {
             return {
                 ...state,
                 isFetching: false,
-                xmaximum: action.xmaximum,
-                ymaximum: action.ymaximum,
-                pixels: action.pixels
+                xmaximum: action.colors[0].length,
+                ymaximum: action.colors.length,
+                colors: action.colors
             };
         case ActionTypes.SELECT_PIXEL:
             return {
@@ -76,7 +74,7 @@ const initialUserState = {
     userId: uuid()
 };
 
-function user(state = initialUserState, action) {
+function user(state = initialUserState) {
     return state;
 }
 

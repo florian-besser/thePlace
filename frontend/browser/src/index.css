@@ -15,6 +15,7 @@ body {
 }
 
 .place {
+  float: left;
   margin: 20px;
 }
 

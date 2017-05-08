@@ -12,7 +12,7 @@ import static redis.clients.util.SafeEncoder.encode;
 public class RedisStore {
 
     public static final String COLORS = "colors";
-    public static final int SECONDS = 300;
+    public static final int SECONDS = 10;
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
     public static int BYTES_PER_COLOR = 3;
