@@ -5,6 +5,7 @@ import foo.bar.board.Pixel;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
@@ -37,8 +38,11 @@ public class Resource {
     @PUT
     @Path("place/{x}/{y}")
     public void putPixel(@PathParam("x") int x, @PathParam("y") int y,
-                         @QueryParam("color") String color,
-                         @QueryParam("user") String user) {
+                         @NotNull @QueryParam("color") String color,
+                         @NotNull @QueryParam("user") String user) {
+        if (color == null || user == null) {
+            throw new RuntimeException("Color and User must not be null!");
+        }
         Board.DEFAULT.setPixel(new Pixel(x, y, color), user);
     }
 }

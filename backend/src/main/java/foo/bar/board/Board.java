@@ -44,12 +44,12 @@ public class Board {
     public void setPixel(Pixel toSet, String user) {
         if (!isAllowed(user)) {
             System.out.println("NOT updating Pixel at " + toSet.getX() + " " + toSet.getY() +
-                    " with Color " + toSet.getColor());
+                    " with Color " + toSet.getColor() + " for user " + user);
             return;
         }
 
         System.out.println("Updating Pixel at " + toSet.getX() + " " + toSet.getY() +
-                " with Color " + toSet.getColor());
+                " with Color " + toSet.getColor() + " for user " + user);
 
         // Forbid user to change more Pixels for 5 minutes
         userChanges.put(user, LocalDateTime.now());
