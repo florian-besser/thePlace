@@ -10,15 +10,17 @@ public class TestRedis {
 
     public static void main(String[] args) {
         Jedis jedis = new Jedis("localhost");
-        jedis.set("foo", "bar");
-        String value = jedis.get("foo");
-        System.out.println(value);
-        System.out.println(jedis.get("asdf"));
-        System.out.println(jedis.get("asdf2"));
 
+        System.out.println(jedis.get("colors"));
 
         RedisInterfaceImpl redisInterface = new RedisInterfaceImpl();
-        redisInterface.setPixel(BoardDimensions.DEFAULT, 0, 0, Color.blue);
-//        System.out.println(redisInterface.getBoard());
+        redisInterface.resetBoard();
+        for (int x = 0; x < BoardDimensions.DEFAULT.getXMaximum(); x++) {
+            for (int y = 0; y < BoardDimensions.DEFAULT.getYMaximum(); y++) {
+                System.out.println("pixel " + x + " " + y);
+                redisInterface.setPixel(BoardDimensions.DEFAULT, x, y, Color.blue);
+                System.out.println(redisInterface.getBoard());
+            }
+        }
     }
 }

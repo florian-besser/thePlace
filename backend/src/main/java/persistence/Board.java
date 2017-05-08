@@ -6,22 +6,20 @@ import java.util.Arrays;
 public class Board {
 
     public static int BYTES_PER_COLOR = 3;
+    private final BoardDimensions boardDimensions;
 
     private Color[][] colors;
 
 
     public Board(BoardDimensions boardDimensions, byte[] colorsInBytes) {
+        this.boardDimensions = boardDimensions;
         int yMax = boardDimensions.getYMaximum();
         int xMax = boardDimensions.getXMaximum();
         colors = new Color[xMax][yMax];
         for (int y = 0; y < yMax; y++) {
             for (int x = 0; x < xMax; x++) {
-                int offset = calculateOffset(boardDimensions, y, x);
-
-                Color color = new Color(
-                        colorsInBytes[offset],
-                        colorsInBytes[offset + 1],
-                        colorsInBytes[offset + 2]);
+                int offset = calculateOffset(boardDimensions, x, y);
+                Color color = new Color(colorsInBytes[offset] & 0xff, colorsInBytes[offset + 1] & 0xff, colorsInBytes[offset + 2] & 0xff);
                 colors[x][y] = color;
             }
         }
@@ -34,6 +32,10 @@ public class Board {
 
     @Override
     public String toString() {
-        return Arrays.toString(colors);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int x = 0; x < boardDimensions.getXMaximum(); x++) {
+            stringBuilder.append(Arrays.toString(colors[x]) + "\n");
+        }
+        return stringBuilder.toString();
     }
 }
