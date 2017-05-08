@@ -1,8 +1,8 @@
 // import io from 'socket.io-client';
-import {pixelUpdated} from '../actions/';
+import {pixelUpdated, API_HOST} from '../actions/';
 
-const socket_url = `ws://localhost:2222/events/`;
-const socket = new WebSocket(socket_url);
+const SOCKET_URL = `ws://${API_HOST}/events/`;
+const socket = new WebSocket(SOCKET_URL);
 
 
 export const init = (store) => {
