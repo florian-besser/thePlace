@@ -26,10 +26,8 @@ public class TestRedis {
                 System.out.println("pixel " + x + " " + y);
                 redisInterface.setPixel(boardDimensions, x, y, Color.blue);
                 Color[][] boardColors = redisInterface.getBoardColors(boardDimensions);
-                for (Color[] colors :
-                        boardColors) {
-                    for (Color c : colors
-                            ) {
+                for (Color[] colors : boardColors) {
+                    for (Color c : colors) {
                         String hex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
                         System.out.println(hex);
                     }
