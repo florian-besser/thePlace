@@ -1,5 +1,7 @@
 package persistence;
 
+import foo.bar.board.BoardDimensions;
+
 import java.awt.*;
 import java.util.Arrays;
 
@@ -30,11 +32,15 @@ public class Board {
         return (y * dimensions.getXMaximum() + x) * BYTES_PER_COLOR;
     }
 
+    public Color[][] getColors() {
+        return colors;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (int x = 0; x < boardDimensions.getXMaximum(); x++) {
-            stringBuilder.append(Arrays.toString(colors[x]) + "\n");
+            stringBuilder.append(Arrays.toString(colors[x])).append("\n");
         }
         return stringBuilder.toString();
     }

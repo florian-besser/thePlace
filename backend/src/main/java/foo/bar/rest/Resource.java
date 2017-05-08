@@ -3,13 +3,13 @@ package foo.bar.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.Board;
+import foo.bar.board.BoardDimensions;
 import foo.bar.board.Pixel;
 import foo.bar.mq.MessageSender;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.BoardDimensions;
 import persistence.RedisStore;
 
 import javax.validation.constraints.NotNull;
@@ -45,7 +45,7 @@ public class Resource {
     @Path("place")
     @Produces(MediaType.APPLICATION_JSON)
     public Board place() {
-        return Board.DEFAULT;
+        return Board.THE_BOARD;
     }
 
     @PUT
@@ -59,7 +59,7 @@ public class Resource {
                     entity("Color and User must not be null!").
                     build();
         }
-        Board board = Board.DEFAULT;
+        Board board = Board.THE_BOARD;
         if (x < 0 || y < 0 || x >= board.getXMaximum() || y >= board.getYMaximum()) {
             return Response.
                     status(Response.Status.BAD_REQUEST).

@@ -1,4 +1,4 @@
-package persistence;
+package foo.bar.board;
 
 public class BoardDimensions {
 
@@ -21,6 +21,6 @@ public class BoardDimensions {
     }
 
     public int getSizeInBytes() {
-        return xMaximum * yMaximum * Board.BYTES_PER_COLOR;
+        return xMaximum * yMaximum * persistence.Board.BYTES_PER_COLOR;
     }
 }

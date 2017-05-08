@@ -1,6 +1,6 @@
 package foo.bar;
 
-import persistence.BoardDimensions;
+import foo.bar.board.BoardDimensions;
 import persistence.RedisStore;
 import redis.clients.jedis.Jedis;
 
@@ -15,11 +15,12 @@ public class TestRedis {
 
 
         RedisStore redisInterface = new RedisStore();
-        redisInterface.resetBoard();
-        for (int x = 0; x < BoardDimensions.DEFAULT.getXMaximum(); x++) {
-            for (int y = 0; y < BoardDimensions.DEFAULT.getYMaximum(); y++) {
+        BoardDimensions boardDimensions = BoardDimensions.DEFAULT;
+        redisInterface.resetBoard(boardDimensions);
+        for (int x = 0; x < boardDimensions.getXMaximum(); x++) {
+            for (int y = 0; y < boardDimensions.getYMaximum(); y++) {
                 System.out.println("pixel " + x + " " + y);
-                redisInterface.setPixel(BoardDimensions.DEFAULT, x, y, Color.blue);
+                redisInterface.setPixel(boardDimensions, x, y, Color.blue);
                 System.out.println(redisInterface.getBoard());
             }
         }

@@ -32,6 +32,6 @@ public class MessageReceiver extends DefaultConsumer {
 
         ObjectMapper mapper = new ObjectMapper();
         Pixel pixel = mapper.readValue(message, Pixel.class);
-        Board.DEFAULT.setPixel(pixel);
+        Board.THE_BOARD.setPixel(pixel);
     }
 }

@@ -1,5 +1,6 @@
 package persistence;
 
+import foo.bar.board.BoardDimensions;
 import redis.clients.jedis.Jedis;
 import redis.clients.util.SafeEncoder;
 
@@ -25,6 +26,11 @@ public class RedisStore {
         this.jedis.bitfield("colors", "set", "u24", offset + "", i + "");
     }
 
+    public void resetBoard(BoardDimensions boardDimensions) {
+        jedis.del(COLORS);
+        initBoardIfNotExists(boardDimensions);
+    }
+
     private void initBoardIfNotExists(BoardDimensions dimensions) {
         if (!jedis.exists(COLORS)) {
             byte[] bytes = new byte[dimensions.getSizeInBytes()];
@@ -33,13 +39,15 @@ public class RedisStore {
         }
     }
 
-    public void resetBoard() {
-        jedis.del(COLORS);
-    }
-
+    //Test Only
     public Board getBoard() {
         byte[] colors = jedis.get(encode("colors"));
         return new Board(BoardDimensions.DEFAULT, colors);
+    }
+
+    public Color[][] getBoardColors(BoardDimensions boardDimensions) {
+        byte[] colors = jedis.get(encode("colors"));
+        return new Board(boardDimensions, colors).getColors();
     }
 
     public boolean isUserAllowed(String userId) {
@@ -50,4 +58,5 @@ public class RedisStore {
         jedis.set("user_" + userId, "asdf");
         jedis.expire("user_" + userId, SECONDS);
     }
+
 }

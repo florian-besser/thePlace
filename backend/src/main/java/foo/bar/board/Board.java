@@ -8,45 +8,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.RedisStore;
 
+import java.awt.*;
 import java.util.Set;
 
 public class Board {
     private static final Logger LOGGER = LoggerFactory.getLogger(Board.class);
 
-    public static Board DEFAULT = new Board(4, 4);
+    public static Board THE_BOARD = new Board(4, 4);
 
-    private final int xMaximum;
-    private final int yMaximum;
-    // HEX Strings
-    private final Pixel[] pixels;
+    // [Y][X]
+    private final Color[][] colors;
 
-    private final RedisStore redisStore = new RedisStore();
+    private Board(int xMaximum, int yMaximum) {
+        BoardDimensions boardDimensions = new BoardDimensions(xMaximum, yMaximum);
 
-    public Board(int xMaximum, int yMaximum) {
-        redisStore.resetBoard();
-        this.xMaximum = xMaximum;
-        this.yMaximum = yMaximum;
-        this.pixels = new Pixel[xMaximum * yMaximum];
-        // Set everything to black
-        for (int i = 0; i < pixels.length; i++) {
-            int x = i % xMaximum;
-            int y = i / xMaximum;
-            String color = "000000";
-            LOGGER.info("Creating Pixel at " + x + " " + y + " with Color " + color);
-            pixels[i] = new Pixel(x, y, color);
-        }
+        // Read from Redis
+        RedisStore redisStore = new RedisStore();
+        redisStore.resetBoard(boardDimensions);
+        this.colors = redisStore.getBoardColors(boardDimensions);
     }
 
     public int getXMaximum() {
-        return xMaximum;
+        return colors[0].length;
+    }
+
+    // Used by Jackson
+    public Color[][] getColors() {
+        return colors;
     }
 
     public int getYMaximum() {
-        return yMaximum;
-    }
-
-    public Pixel[] getPixels() {
-        return pixels;
+        return colors.length;
     }
 
     public void setPixel(Pixel toSet) {
@@ -54,8 +46,7 @@ public class Board {
                 " with Color " + toSet.getColor());
 
         // Change actual Pixel color
-        int index = toSet.getX() + toSet.getY() * xMaximum;
-        pixels[index] = toSet;
+        colors[toSet.getY()][toSet.getX()] = Color.decode(toSet.getColor());
 
         // Update all connected clients
         Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
