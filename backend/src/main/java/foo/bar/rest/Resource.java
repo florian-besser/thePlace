@@ -82,7 +82,8 @@ public class Resource {
         LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
                 " with Color " + body.getColor() + " for user " + body.getUser());
         BoardDimensions dimensions = new BoardDimensions(xMax, yMax);
-        redisStore.setPixel(dimensions, x, y, Color.decode(body.getColor()));
+        SimpleColor color = new SimpleColor(body.getColor());
+        redisStore.setPixel(dimensions, x, y, color);
 
         // Send message
         new MessageSender().sendMessage(serialize(new Pixel(x, y, new SimpleColor(body.getColor()))));

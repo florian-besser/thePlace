@@ -7,7 +7,6 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.util.SafeEncoder;
 
-import java.awt.*;
 
 import static redis.clients.util.SafeEncoder.encode;
 
@@ -26,11 +25,12 @@ public class RedisStore {
         return (y * dimensions.getXMaximum() + x) * BYTES_PER_COLOR;
     }
 
-    public void setPixel(BoardDimensions dimensions, int x, int y, Color color) {
+    public void setPixel(BoardDimensions dimensions, int x, int y, SimpleColor color) {
         try (Jedis jedis = pool.getResource()) {
             initBoardIfNotExists(jedis, dimensions);
             int offset = calculateOffset(dimensions, x, y) * 8;
-            int i = color.getRGB() & 0xffffff;
+            String color1 = color.getColor();
+            int i = Integer.parseInt(color1, 16);
 //        System.out.println(offset + " " + i);
             jedis.bitfield("colors", "set", "u24", offset + "", i + "");
         }
