@@ -66,6 +66,8 @@ public class App {
             channel.basicConsume(MessageFactory.getQueueName(), true, consumer);
 
             server.join();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             server.destroy();
         }
