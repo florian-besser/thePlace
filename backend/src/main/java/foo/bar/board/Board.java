@@ -48,12 +48,17 @@ public class Board {
                 " with Color " + toSet.getColor());
 
         // Change actual Pixel color
-        colors[toSet.getY()][toSet.getX()] = toSet.getColor();
+        setPixelInternal(toSet);
 
         // Update all connected clients
         Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
         String toSetStr = serialize(toSet);
         websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+    }
+
+    // Only to be used from this class and Bots!
+    public void setPixelInternal(Pixel toSet) {
+        colors[toSet.getY()][toSet.getX()] = toSet.getColor();
     }
 
     private String serialize(Pixel toSet) {

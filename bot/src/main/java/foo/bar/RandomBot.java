@@ -1,9 +1,10 @@
 package foo.bar;
 
 import foo.bar.board.Board;
+import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
 import foo.bar.rest.PutPixelBody;
-import foo.bar.websocket.EventSocket;
+import foo.bar.websocket.EventSocketListener;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.glassfish.jersey.client.ClientConfig;
@@ -15,35 +16,46 @@ import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBot {
+    public static final int MAX_REQUESTS = 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static ThreadLocalRandom current = ThreadLocalRandom.current();
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
 
     public static void main(String[] args) throws Exception {
-        EventSocket socket = getSocket();
-        Board board = getBoard();
-        SimpleColor[][] colors = board.getColors();
+        EventSocketListener socket = getSocket();
+        Board originalBoard = getBoard();
+        SimpleColor[][] colors = originalBoard.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;
 
-        while (true) {
+        for (int i = 0; i < MAX_REQUESTS; i++) {
             putPixel(xMax, yMax);
         }
+
+        Thread.sleep(5000);
+
+        Board finishedBoard = getBoard();
+        replayMessagesOn(originalBoard, socket.getSetPixels());
+        assertEquals(originalBoard, finishedBoard);
+
+        socket.getSession().close();
     }
 
-    private static EventSocket getSocket() throws Exception {
+    private static EventSocketListener getSocket() throws Exception {
         URI uri = URI.create("ws://localhost:2222/events/");
 
         WebSocketClient client = new WebSocketClient();
         client.start();
         // The socket that receives events
-        EventSocket socket = new EventSocket();
+        EventSocketListener socket = new EventSocketListener();
         // Attempt Connect
         Future<Session> fut = client.connect(socket, uri);
         // Wait for Connect
@@ -67,7 +79,7 @@ public class RandomBot {
         for (SimpleColor[] row : board.getColors()) {
             int x = 0;
             for (SimpleColor c : row) {
-                LOGGER.info("Initial content at " + y + " " + x + " is " + c);
+                LOGGER.info("Content at " + y + " " + x + " is " + c);
                 x++;
             }
             y++;
@@ -97,5 +109,33 @@ public class RandomBot {
         }
 
         return sb.toString().substring(0, numchars);
+    }
+
+    private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {
+        for (Pixel p : pixels) {
+            originalBoard.setPixelInternal(p);
+        }
+    }
+
+    private static void assertEquals(Board replayBoard, Board finishedBoard) {
+        SimpleColor[][] replayBoardColors = replayBoard.getColors();
+        SimpleColor[][] finishedBoardColors = finishedBoard.getColors();
+        boolean anyFailed = false;
+        for (int y = 0; y < replayBoardColors.length; y++) {
+            for (int x = 0; x < replayBoardColors[0].length; x++) {
+                SimpleColor replayColor = replayBoardColors[y][x];
+                SimpleColor finishedColor = finishedBoardColors[y][x];
+                if (Objects.equals(replayColor.getColor(), finishedColor.getColor())) {
+                    LOGGER.debug("EQUAL content at " + y + " " + x + " is " + replayColor.getColor());
+                } else {
+                    anyFailed = true;
+                    LOGGER.warn("NON-EQUAL content at " + y + " " + x + ": " +
+                            "App says " + finishedColor.getColor() + ", Messages say " + replayColor.getColor());
+                }
+            }
+        }
+        if (!anyFailed) {
+            LOGGER.info("Test successful, thePlace is consistent");
+        }
     }
 }
