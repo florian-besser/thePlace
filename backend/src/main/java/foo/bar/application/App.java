@@ -4,15 +4,21 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import foo.bar.mq.MessageFactory;
 import foo.bar.mq.MessageReceiver;
+import foo.bar.rest.CORSResponseFilter;
 import foo.bar.websocket.EventServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 
 public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
@@ -35,6 +41,7 @@ public class App {
         config.packages("foo.bar");
         ServletHolder servlet = new ServletHolder("rs-rest", new ServletContainer(config));
         context.addServlet(servlet, "/rest/*");
+        context.addFilter(CORSResponseFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
         // Add a websocket to a specific path spec
         ServletHolder holderEvents = new ServletHolder("ws-events", EventServlet.class);
