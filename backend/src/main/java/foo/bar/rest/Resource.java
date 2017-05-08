@@ -36,10 +36,9 @@ public class Resource {
 
     @PUT
     @Path("place/{x}/{y}")
-    @Produces(MediaType.APPLICATION_JSON)
     public void putPixel(@PathParam("x") int x, @PathParam("y") int y,
                          @QueryParam("color") String color,
                          @QueryParam("user") String user) {
-        Board.DEFAULT.setPixel(new Pixel(x, y, color, user));
+        Board.DEFAULT.setPixel(new Pixel(x, y, color), user);
     }
 }

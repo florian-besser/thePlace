@@ -6,7 +6,7 @@ public class Pixel {
     private final int y;
     private final String color;
 
-    public Pixel(int x, int y, String color, String user) {
+    public Pixel(int x, int y, String color) {
         this.x = x;
         this.y = y;
         this.color = color;
