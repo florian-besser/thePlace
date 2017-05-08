@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import uuid from "../lib/uuid";
 import {combineReducers} from "redux";
 import * as ActionTypes from "../actions/actionTypes";
@@ -15,7 +16,8 @@ const initialBoardState = {
         x: undefined,
         y: undefined
     },
-    pickerColor: undefined
+    pickerColor: undefined,
+    timeoutExpiry: undefined, // moment when board can be updated again by this user
 };
 
 function board(state = initialBoardState, action) {
@@ -31,9 +33,11 @@ function board(state = initialBoardState, action) {
                 updatePending: true
             };
         case ActionTypes.SET_COLOR_SUCCESS:
+            // TODO: set timeout to trigger rerender
             return {
                 ...state,
-                updatePending: false
+                updatePending: false,
+                timeoutExpiry: moment().add(10, 'seconds')
             };
         case ActionTypes.PIXEL_UPDATED:
             const updatedPixels = [...state.colors];
