@@ -1,5 +1,8 @@
 package foo.bar;
 
+import foo.bar.rest.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import foo.bar.board.BoardDimensions;
 import persistence.RedisStore;
 import redis.clients.jedis.Jedis;
@@ -7,6 +10,7 @@ import redis.clients.jedis.Jedis;
 import java.awt.*;
 
 public class TestRedis {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
 
     public static void main(String[] args) {
         Jedis jedis = new Jedis("localhost");
@@ -25,9 +29,8 @@ public class TestRedis {
             }
         }
 
-        System.out.println(redisInterface.isUserAllowed("stivo"));
-        redisInterface.userHasSetPixel("stivo");
-        System.out.println(redisInterface.isUserAllowed("stivo"));
-        System.out.println(Color.decode("#ffffff"));
+        LOGGER.info("" + redisInterface.tryToSetPixel("stivo"));
+        LOGGER.info("" + redisInterface.tryToSetPixel("stivo"));
+
     }
 }

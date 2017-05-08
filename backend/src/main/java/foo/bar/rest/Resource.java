@@ -68,16 +68,14 @@ public class Resource {
                     build();
         }
 
-        // Check Redis to see if User is allowed
-        if (!redisStore.isUserAllowed(user)) {
+        // Check for permission for this user to set another pixel, only allowed every 5 minutes
+        if (!redisStore.tryToSetPixel(user)) {
             return Response.
                     status(Response.Status.BAD_REQUEST).
                     entity("User is not allowed").
                     build();
         }
 
-        // Forbid user to change more Pixels for 5 minutes
-        redisStore.userHasSetPixel(user);
         LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
                 " with Color " + color + " for user " + user);
         redisStore.setPixel(new BoardDimensions(board.getXMaximum(), board.getYMaximum()), x, y, Color.decode(color));
