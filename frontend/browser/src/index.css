@@ -12,6 +12,11 @@ body {
   width: 10px;
   height: 10px;
   cursor: pointer;
+  box-sizing: border-box;
+}
+
+.tile.selected {
+  border: 1px solid white;
 }
 
 .place {
