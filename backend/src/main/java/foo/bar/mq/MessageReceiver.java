@@ -6,7 +6,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import foo.bar.board.Board;
-import foo.bar.board.Pixel;
+import foo.bar.model.Pixel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

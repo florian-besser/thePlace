@@ -1,4 +1,4 @@
-package foo.bar.board;
+package foo.bar.model;
 
 public class SimpleColor {
 

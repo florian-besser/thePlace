@@ -2,6 +2,8 @@ package foo.bar.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import foo.bar.model.Pixel;
+import foo.bar.model.SimpleColor;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
 import org.slf4j.Logger;

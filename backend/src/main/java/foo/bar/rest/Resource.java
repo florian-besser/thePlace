@@ -1,12 +1,11 @@
 package foo.bar.rest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.Board;
 import foo.bar.board.BoardDimensions;
-import foo.bar.board.Pixel;
-import foo.bar.board.SimpleColor;
+import foo.bar.model.Pixel;
+import foo.bar.model.SimpleColor;
 import foo.bar.mq.MessageSender;
 import foo.bar.websocket.EventSocket;
 import foo.bar.websocket.PooledSessionCreator;
@@ -48,22 +47,6 @@ public class Resource {
     @Produces(MediaType.APPLICATION_JSON)
     public Board place() {
         return Board.THE_BOARD;
-    }
-
-    private static class PutPixelBody {
-        @NotNull
-        private String color;
-
-        @NotNull
-        private String user;
-
-        public String getColor() {
-            return color;
-        }
-
-        public String getUser() {
-            return user;
-        }
     }
 
     @PUT
@@ -108,6 +91,22 @@ public class Resource {
             return mapper.writeValueAsString(toSet);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error wile converting Pixel to String.", e);
+        }
+    }
+
+    private static class PutPixelBody {
+        @NotNull
+        private String color;
+
+        @NotNull
+        private String user;
+
+        public String getColor() {
+            return color;
+        }
+
+        public String getUser() {
+            return user;
         }
     }
 }

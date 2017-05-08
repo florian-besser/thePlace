@@ -1,7 +1,7 @@
 package persistence;
 
 import foo.bar.board.BoardDimensions;
-import foo.bar.board.SimpleColor;
+import foo.bar.model.SimpleColor;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
