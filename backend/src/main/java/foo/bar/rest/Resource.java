@@ -88,12 +88,10 @@ public class Resource {
 
     private String serialize(Pixel toSet) {
         ObjectMapper mapper = new ObjectMapper();
-        String toSetStr;
         try {
-            toSetStr = mapper.writeValueAsString(toSet);
+            return mapper.writeValueAsString(toSet);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error wile converting Pixel to String.", e);
         }
-        return toSetStr;
     }
 }
