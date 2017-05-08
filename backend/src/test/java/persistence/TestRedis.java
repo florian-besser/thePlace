@@ -1,11 +1,10 @@
-package foo.bar;
+package persistence;
 
 import foo.bar.board.BoardDimensions;
 import foo.bar.model.SimpleColor;
 import foo.bar.rest.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.RedisStore;
 import redis.clients.jedis.Jedis;
 
 import java.awt.*;
