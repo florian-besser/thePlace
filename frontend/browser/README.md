@@ -1,6 +1,10 @@
 # Installation
 
     sudo apt-get install npm
-    npm install --global n
+    sudo npm install --global n
     sudo n latest
     npm install
+
+# Running the app
+
+    npm start
