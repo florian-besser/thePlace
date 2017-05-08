@@ -1,7 +1,9 @@
 import fetch from 'isomorphic-fetch'
+import parse from 'url-parse';
 import * as ActionType from "./actionTypes";
 
-const API_ENDPOINT = 'http://localhost:2222/rest/thePlace';
+export const API_HOST = parse(window.location).hostname + ':2222';
+const REST_API = '//' + API_HOST + '/rest/thePlace';
 const request_options = {};
 
 /*
@@ -27,7 +29,7 @@ export function setPickerColor(color) {
 export function setColor(x, y, color) {
     return (dispatch, getState) => {
         dispatch(setColorRequested(x, y, color));
-        const request = new Request(API_ENDPOINT + `/place/${x}/${y}`, {
+        const request = new Request(REST_API + `/place/${x}/${y}`, {
             method: 'put',
             headers: new Headers({
                 'Content-Type': 'application/json'
@@ -87,7 +89,7 @@ export function loadPlaceSuccess(body) {
 export function loadPlace() {
     return dispatch => {
         dispatch(requestPlace());
-        return fetch(API_ENDPOINT + `/place`, request_options)
+        return fetch(REST_API + `/place`, request_options)
             .then(response => response.json())
             .then(json => {
                 dispatch(loadPlaceSuccess(json));
