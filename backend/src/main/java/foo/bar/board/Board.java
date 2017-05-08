@@ -19,7 +19,7 @@ public class Board {
             int y = i / xMaximum;
             String color = "000000";
             System.out.println("Creating Pixel at " + x + " " + y + " with Color " + color);
-            pixels[i] = new Pixel(x, y, color);
+            pixels[i] = new Pixel(x, y, color, "");
         }
     }
 
