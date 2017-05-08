@@ -19,4 +19,11 @@ public class SimpleColor {
     public void setColor(String color) {
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "SimpleColor{" +
+                "color='" + color + '\'' +
+                '}';
+    }
 }

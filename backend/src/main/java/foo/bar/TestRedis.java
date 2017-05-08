@@ -1,6 +1,7 @@
 package foo.bar;
 
 import foo.bar.board.BoardDimensions;
+import foo.bar.board.SimpleColor;
 import foo.bar.rest.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,10 @@ public class TestRedis {
             for (int y = 0; y < boardDimensions.getYMaximum(); y++) {
                 System.out.println("pixel " + x + " " + y);
                 redisInterface.setPixel(boardDimensions, x, y, Color.blue);
-                Color[][] boardColors = redisInterface.getBoardColors(boardDimensions);
-                for (Color[] colors : boardColors) {
-                    for (Color c : colors) {
-                        String hex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
-                        System.out.println(hex);
+                SimpleColor[][] boardColors = redisInterface.getBoardColors(boardDimensions);
+                for (SimpleColor[] colors : boardColors) {
+                    for (SimpleColor c : colors) {
+                        System.out.println(c);
                     }
                 }
             }
