@@ -20,7 +20,7 @@ public class RandomBotConfig {
 
     public static RandomBotConfig IMAGE = new RandomBotConfig(
             10_000,
-            2,
+            5,
             1000,
             1
     );

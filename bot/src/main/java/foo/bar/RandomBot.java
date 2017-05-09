@@ -50,7 +50,7 @@ public class RandomBot {
         int yMax = colors.length;
         List<Thread> threads = new ArrayList<>(config.getRequesterThreads());
         for (int t = 0; t < config.getRequesterThreads(); t++) {
-            Thread thread = new Thread(new ImagePixelPutter(config, xMax, yMax, "lena.jpg"));
+            Thread thread = new Thread(new ImagePixelPutter(config, t, xMax, yMax, "lena.jpg"));
             thread.start();
             threads.add(thread);
         }
