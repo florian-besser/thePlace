@@ -27,7 +27,7 @@ public class RandomBot {
     public static final int MAX_REQUESTS = 1_000;
     public static final int REQUESTER_THREADS = 10;
     public static final int MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD = 100;
-    public static final int CLIENT_THREADS = 1_000;
+    public static final int CLIENT_THREADS = 10_000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
