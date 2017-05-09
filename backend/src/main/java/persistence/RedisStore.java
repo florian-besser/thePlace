@@ -15,7 +15,7 @@ public class RedisStore {
     public static final String COLORS = "colors";
     public static final int SECONDS = 10;
 
-    private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getTargetHost());
+    private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getRedisTargetHost());
     public static int BYTES_PER_COLOR = 3;
 
     public RedisStore() {
