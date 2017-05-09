@@ -1,8 +1,7 @@
 package foo.bar;
 
-import foo.bar.client.ImagePixelPutter;
-import foo.bar.client.PixelPutter;
 import foo.bar.client.RandomPixelPutter;
+import foo.bar.config.Config;
 import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
@@ -49,7 +48,7 @@ public class RandomBot {
         int yMax = colors.length;
         List<Thread> threads = new ArrayList<>(config.getRequesterThreads());
         for (int t = 0; t < config.getRequesterThreads(); t++) {
-            Thread thread = new Thread(new PixelPutter(config, xMax, yMax));
+            Thread thread = new Thread(new RandomPixelPutter(config, xMax, yMax));
             thread.start();
             threads.add(thread);
         }
