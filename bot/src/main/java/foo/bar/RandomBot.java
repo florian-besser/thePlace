@@ -1,5 +1,6 @@
 package foo.bar;
 
+import com.google.common.util.concurrent.RateLimiter;
 import foo.bar.board.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
@@ -23,12 +24,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBot {
+    public static final String TARGET_HOST = "192.168.2.96:2222";
     public static final int MAX_REQUESTS = 1000;
-    public static final String TARGET_HOST = "localhost:2222";
+    public static final int MAX_REQUESTS_PER_SECOND = 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
+    private static RateLimiter throttle = RateLimiter.create(MAX_REQUESTS_PER_SECOND);
     private static ThreadLocalRandom current = ThreadLocalRandom.current();
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
-
 
     public static void main(String[] args) throws Exception {
         EventSocketListener socket = getSocket();
@@ -80,7 +82,7 @@ public class RandomBot {
         for (SimpleColor[] row : board.getColors()) {
             int x = 0;
             for (SimpleColor c : row) {
-                LOGGER.info("Content at " + y + " " + x + " is " + c);
+                LOGGER.debug("Content at " + y + " " + x + " is " + c);
                 x++;
             }
             y++;
@@ -89,6 +91,7 @@ public class RandomBot {
     }
 
     private static void putPixel(int xMax, int yMax) {
+        throttle.acquire();
         int x = current.nextInt(0, xMax);
         int y = current.nextInt(0, yMax);
         WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place")
