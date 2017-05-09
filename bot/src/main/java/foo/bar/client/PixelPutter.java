@@ -2,6 +2,7 @@ package foo.bar.client;
 
 import com.google.common.util.concurrent.RateLimiter;
 import foo.bar.RandomBot;
+import foo.bar.RandomBotConfig;
 import foo.bar.rest.PutPixelBody;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
@@ -15,15 +16,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PixelPutter implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PixelPutter.class);
+    private RandomBotConfig config;
     private final int xMax;
     private final int yMax;
     public ThreadLocalRandom current = ThreadLocalRandom.current();
-    private RateLimiter throttle = RateLimiter.create(RandomBot.MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD);
+    private RateLimiter throttle;
     private Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
-    public PixelPutter(int xMax, int yMax) {
+    public PixelPutter(RandomBotConfig config, int xMax, int yMax) {
+        this.config = config;
         this.xMax = xMax;
         this.yMax = yMax;
+        throttle = RateLimiter.create(config.getMaxRequestsPerSecondPerRequesterThread());
     }
 
     @Override
@@ -33,7 +37,7 @@ public class PixelPutter implements Runnable {
             current.nextInt();
         }
         // Now start putting pixels
-        for (int i = 0; i < RandomBot.MAX_REQUESTS / RandomBot.REQUESTER_THREADS; i++) {
+        for (int i = 0; i < config.getMaxRequests() / config.getRequesterThreads(); i++) {
             putPixel(xMax, yMax);
         }
         client.close();
