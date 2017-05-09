@@ -18,7 +18,7 @@ public class PixelPutter implements Runnable {
     private final int xMax;
     private final int yMax;
     public ThreadLocalRandom current = ThreadLocalRandom.current();
-    private RateLimiter throttle = RateLimiter.create(RandomBot.MAX_REQUESTS_PER_SECOND_PER_THREAD);
+    private RateLimiter throttle = RateLimiter.create(RandomBot.MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD);
     private Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public PixelPutter(int xMax, int yMax) {
@@ -33,7 +33,7 @@ public class PixelPutter implements Runnable {
             current.nextInt();
         }
         // Now start putting pixels
-        for (int i = 0; i < RandomBot.MAX_REQUESTS / RandomBot.THREADS; i++) {
+        for (int i = 0; i < RandomBot.MAX_REQUESTS / RandomBot.REQUESTER_THREADS; i++) {
             putPixel(xMax, yMax);
         }
     }

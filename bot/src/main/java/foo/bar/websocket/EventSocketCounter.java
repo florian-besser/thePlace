@@ -1,31 +1,26 @@
 package foo.bar.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.RandomBot;
-import foo.bar.model.Pixel;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Future;
 
-public class EventSocketListener extends WebSocketAdapter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocketListener.class);
-    List<Pixel> setPixels = new ArrayList<>();
+public class EventSocketCounter extends WebSocketAdapter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocketCounter.class);
+    int msgsReceived = 0;
 
-    public static EventSocketListener getNewInstance() throws Exception {
+    public static EventSocketCounter getNewInstance() throws Exception {
         URI uri = URI.create("ws://" + RandomBot.TARGET_HOST + "/events/");
 
         WebSocketClient client = new WebSocketClient();
         client.start();
         // The socket that receives events
-        EventSocketListener socket = new EventSocketListener();
+        EventSocketCounter socket = new EventSocketCounter();
         // Attempt Connect
         Future<Session> fut = client.connect(socket, uri);
         // Wait for Connect
@@ -47,8 +42,7 @@ public class EventSocketListener extends WebSocketAdapter {
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         LOGGER.debug("Received TEXT message: " + message);
-        Pixel p = serialize(message);
-        setPixels.add(p);
+        msgsReceived++;
     }
 
     @Override
@@ -63,17 +57,7 @@ public class EventSocketListener extends WebSocketAdapter {
         cause.printStackTrace(System.err);
     }
 
-
-    private Pixel serialize(String json) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(json, Pixel.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Error wile converting String to Pixel.", e);
-        }
-    }
-
-    public List<Pixel> getSetPixels() {
-        return setPixels;
+    public int getMsgsReceived() {
+        return msgsReceived;
     }
 }
