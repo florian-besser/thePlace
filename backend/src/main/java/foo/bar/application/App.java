@@ -55,11 +55,6 @@ public class App {
             Channel channel = MessageFactory.getChannel();
             LOGGER.info("Listening to RabbitMQ");
 
-            // Wait a little to make sure you read the right stuff from Redis
-            Thread.sleep(5000);
-
-            // TODO: 5/8/17 READ STATE FROM REDIS
-
             // Start consuming our queue
             LOGGER.info("Starting to consume RabbitMQ messages");
             Consumer consumer = new MessageReceiver(channel);

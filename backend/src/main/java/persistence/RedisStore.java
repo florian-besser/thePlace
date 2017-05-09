@@ -29,7 +29,7 @@ public class RedisStore {
             initBoardIfNotExists(jedis, dimensions);
             int offset = calculateOffset(dimensions, x, y) * 8;
             String color1 = color.getColor().substring(1);
-            int i = Integer.parseInt(color1, 16);
+            int i = Integer.parseInt(color1, 16) & 0xffffff;
 //        System.out.println(offset + " " + i);
             jedis.bitfield("colors", "set", "u24", offset + "", i + "");
         }
