@@ -18,7 +18,7 @@ public enum RandomBotConfig {
 
     IMAGE(
             10_000,
-            2,
+            5,
             1000,
             1
     );

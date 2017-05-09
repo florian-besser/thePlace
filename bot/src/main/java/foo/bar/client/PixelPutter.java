@@ -3,6 +3,7 @@ package foo.bar.client;
 import com.google.common.util.concurrent.RateLimiter;
 import foo.bar.RandomBot;
 import foo.bar.RandomBotConfig;
+import foo.bar.model.Pixel;
 import foo.bar.rest.PutPixelBody;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
@@ -38,15 +39,16 @@ public abstract class PixelPutter implements Runnable {
         }
         // Now start putting pixels
         for (int i = 0; i < config.getMaxRequests() / config.getRequesterThreads(); i++) {
-            putPixel(xMax, yMax);
+            putPixel();
         }
         client.close();
     }
 
-    private void putPixel(int xMax, int yMax) {
+    private void putPixel() {
         throttle.acquire();
-        int x = current.nextInt(0, xMax);
-        int y = current.nextInt(0, yMax);
+        Pixel nextPixel = getNextPixel();
+        int x = nextPixel.getX();
+        int y = nextPixel.getY();
         WebTarget webTarget = client.target("http://" + RandomBot.TARGET_HOST + "/rest/thePlace").path("place")
                 .path(Integer.toString(x))
                 .path(Integer.toString(y));
@@ -55,12 +57,12 @@ public abstract class PixelPutter implements Runnable {
         PutPixelBody entity = new PutPixelBody();
         UUID idOne = UUID.randomUUID();
         entity.setUser(idOne.toString());
-        entity.setColor(getColor(x, y));
+        entity.setColor(nextPixel.getColor().getColor());
         invocationBuilder.put(Entity.json(entity));
         LOGGER.debug("Updated Pixel " + x + " " + y);
     }
 
-    protected abstract String getColor(int x, int y);
+    protected abstract Pixel getNextPixel();
 
 
     protected int getXMax() {
@@ -69,5 +71,9 @@ public abstract class PixelPutter implements Runnable {
 
     protected int getYMax() {
         return yMax;
+    }
+
+    protected RandomBotConfig getConfig() {
+        return config;
     }
 }
