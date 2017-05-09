@@ -1,0 +1,23 @@
+version: '3'
+services:
+  redis:
+    image: "redis"
+    hostname: redis
+    ports:
+     - 6379
+  rabbitmq:
+    image: "rabbitmq:management"
+    hostname: rabbitmq
+    ports:
+     - 5672
+     - 15672
+  backend:
+    image: "192.168.2.136:5000/backend"
+    ports:
+     - 2222
+    links:
+     - redis
+     - rabbitmq
+    environment:
+     TARGET_HOST_REDIS: redis
+     TARGET_HOST_RABBITMQ: rabbitmq
