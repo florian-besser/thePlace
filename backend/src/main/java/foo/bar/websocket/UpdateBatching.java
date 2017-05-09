@@ -17,7 +17,7 @@ public class UpdateBatching extends Thread {
 
     private final ConcurrentLinkedDeque<Pixel> updatesToSend = new ConcurrentLinkedDeque<>();
 
-    private static final int MAX_UPDATES_PER_SECOND = 10;
+    private static final int MAX_UPDATES_PER_SECOND = 2;
 
     private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
 
@@ -36,7 +36,7 @@ public class UpdateBatching extends Thread {
     }
 
     public void addUpdate(Pixel update) {
-        updatesToSend.addFirst(update);
+        updatesToSend.addLast(update);
     }
 
     @Override
@@ -51,16 +51,21 @@ public class UpdateBatching extends Thread {
             // Update all connected clients
             Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
 
-            ArrayList<EventSocket> eventSockets = new ArrayList<>(websockets);
+            ArrayList<EventSocket> eventSockets = new ArrayList<>();
+            eventSockets.addAll(websockets);
             LOGGER.info("Sending to all websockets: " + toSetStr);
-            eventSockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+            websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
         }
     }
 
     private String prepareUpdate() {
         ArrayList<Pixel> updates = new ArrayList<>();
-        while (!updatesToSend.isEmpty()) {
-            updates.add(updatesToSend.removeLast());
+        while (true) {
+            Pixel pixel = updatesToSend.pollFirst();
+            if (pixel == null) {
+                break;
+            }
+            updates.add(pixel);
         }
         return serialize(updates);
     }
