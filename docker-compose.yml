@@ -13,37 +13,23 @@ services:
      - 15672:15672
     volumes:
      - /var/lib/rabbitmq:/var/lib/rabbitmq
-  backend1:
-    build: backend
-    links:
-     - redis
-     - rabbitmq
+  backend:
+    image: "backend"
     ports:
      - 2222
     environment:
      TARGET_HOST_REDIS: redis
      TARGET_HOST_RABBITMQ: rabbitmq
-  backend2:
-    build: backend
-    links:
-     - redis
-     - rabbitmq
-    ports:
-     - 2222
-    environment:
-     TARGET_HOST_REDIS: redis
-     TARGET_HOST_RABBITMQ: rabbitmq
-  bot1:
-    build: bot
-    links:
-     - backend1:backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+  bot:
+    image: "bot"
     environment:
      TARGET_HOST_BACKEND: backend
      BOT_CONFIG: QUICK_TEST
-  bot2:
-    build: bot
-    links:
-     - backend2:backend
-    environment:
-     TARGET_HOST_BACKEND: backend
-     BOT_CONFIG: QUICK_TEST
+    deploy:
+      mode: replicated
+      replicas: 3
