@@ -19,11 +19,21 @@ services:
      - redis
      - rabbitmq
     ports:
-     - 2222:2222
+     - 2222
     environment:
      TARGET_HOST_REDIS: redis
      TARGET_HOST_RABBITMQ: rabbitmq
     deploy:
-      replicas: 1
+      replicas: 3
       restart_policy:
         condition: on-failure
+  bot:
+    build: bot
+    links:
+     - backend
+    ports:
+     - 2222
+    environment:
+     TARGET_HOST_BACKEND: backend
+    deploy:
+      replicas: 3

@@ -14,4 +14,11 @@ public class Config {
             targetHost = "localhost";
         return targetHost;
     }
+
+    public static String getBackendTargetHost() {
+        String targetHost = System.getenv("TARGET_HOST_BACKEND");
+        if (targetHost == null || "".equals(targetHost))
+            targetHost = "localhost";
+        return targetHost;
+    }
 }

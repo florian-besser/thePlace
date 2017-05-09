@@ -1,8 +1,7 @@
 package foo.bar;
 
-import foo.bar.client.ImagePixelPutter;
-import foo.bar.client.PixelPutter;
 import foo.bar.client.RandomPixelPutter;
+import foo.bar.config.Config;
 import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
@@ -25,12 +24,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class RandomBot {
-    public static final String TARGET_HOST = "localhost:2222";
+    public static final String TARGET_HOST = Config.getBackendTargetHost() + ":2222";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
+    private static final RandomBotConfig config = RandomBotConfig.UI_STRESS;
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
-
-    private static final RandomBotConfig config = RandomBotConfig.IMAGE;
 
     public static void main(String[] args) throws Exception {
         EventSocketListener listener = WebsocketFactory.getListenerInstance();
@@ -50,7 +48,7 @@ public class RandomBot {
         int yMax = colors.length;
         List<Thread> threads = new ArrayList<>(config.getRequesterThreads());
         for (int t = 0; t < config.getRequesterThreads(); t++) {
-            Thread thread = new Thread(new ImagePixelPutter(config, t, xMax, yMax, "lena.jpg"));
+            Thread thread = new Thread(new RandomPixelPutter(config, xMax, yMax));
             thread.start();
             threads.add(thread);
         }

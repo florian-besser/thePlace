@@ -7,7 +7,7 @@ const REST_API = '//' + API_HOST + '/rest/thePlace';
 const request_options = {};
 
 /*
-    action creators
+ action creators
  */
 
 export function updateTimeout() {
@@ -15,6 +15,27 @@ export function updateTimeout() {
         type: ActionType.UPDATE_TIMEOUT
     };
 }
+
+export const loadTimeout = () =>
+    (dispatch) => {
+        dispatch(requestTimeout());
+        return fetch(REST_API + `/timeout`)
+            .then(response => response.json())
+            .then(seconds => dispatch(
+                loadTimeoutSuccess(seconds))
+            );
+    };
+
+
+export const requestTimeout = () => ({
+    type: ActionType.REQUEST_TIMEOUT
+});
+
+export const loadTimeoutSuccess = (timeoutSeconds) => ({
+    type: ActionType.LOAD_TIMEOUT_SUCCESS,
+    seconds: timeoutSeconds
+});
+
 
 export function selectPixel(x, y, color) {
     return {
@@ -28,7 +49,7 @@ export function selectPixel(x, y, color) {
 export function setPickerColor(color) {
     return {
         type: ActionType.SET_PICKER_COLOR,
-        color: color
+        color: color.hex
     };
 }
 
@@ -46,13 +67,28 @@ export function setColor(x, y, color) {
             })
         });
         return fetch(request)
-            .then(response => dispatch(setColorSuccess()));
+            .then(response => {
+                if (response.status === 200) {
+                    dispatch(setColorSuccess());
+                    dispatch(pixelsUpdated([{
+                        x, y, color
+                    }]))
+                } else {
+                    dispatch(setColorError());
+                }
+            });
     };
 }
 
 export function setColorSuccess() {
     return {
         type: ActionType.SET_COLOR_SUCCESS
+    };
+}
+
+export function setColorError() {
+    return {
+        type: ActionType.SET_COLOR_ERROR
     };
 }
 
@@ -78,16 +114,12 @@ export function loadPlaceError() {
 }
 
 /*
- interface body {
-     pixels: {x: number; y: number; color: string}[],
-     xmaximum: number;
-     ymaximum: number;
- }
+ type body = string[][]
  */
 export function loadPlaceSuccess(body) {
     return {
         type: ActionType.LOAD_PLACE_SUCCESS,
-        ...body
+        body: body
     };
 }
 
@@ -103,7 +135,7 @@ export function loadPlace() {
     }
 }
 
-export function pixelUpdated(data) {
+export function pixelsUpdated(data) {
     return {
         type: ActionType.PIXEL_UPDATED,
         pixels: data
