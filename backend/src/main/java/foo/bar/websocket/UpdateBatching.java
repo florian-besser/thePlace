@@ -17,7 +17,7 @@ public class UpdateBatching extends Thread {
 
     private final ConcurrentLinkedDeque<Pixel> updatesToSend = new ConcurrentLinkedDeque<>();
 
-    private static final int MAX_UPDATES_PER_SECOND = 3;
+    private static final int MAX_UPDATES_PER_SECOND = 2;
 
     private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
 

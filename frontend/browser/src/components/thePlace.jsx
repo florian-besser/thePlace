@@ -3,66 +3,58 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {selectPixel} from "../actions";
 import {ColorSelector} from "./ColorPicker";
+import {drawBoard, getPixelCoordinates, PIXEL_SIZE} from "../lib/canvas";
 
 
-const PIXEL_SIZE = 10;
+function ThePlaceComponent({board, selectPixel}) {
+    const hasLoaded = board.colors.length > 0;
 
-function ThePlaceComponent({board, colorSelector, selectPixel}) {
-    const width = board.colors[0] ? board.colors[0].length : 0;
-    const height = board.colors.length;
     return (
         <div>
-            <div className='place' style={{width: width * PIXEL_SIZE, height: height * PIXEL_SIZE}}>
-                {board.colors.map((line, y) => (
-                    <TileRow
-                        key={y}
-                        y={y}
-                        line={line}
-                        selectPixel={selectPixel}
-                        selectedPixel={colorSelector.selectedPixel}
-                    />
-                ))}
-            </div>
+            {hasLoaded && <PlaceCanvas colors={board.colors} selectPixel={selectPixel}/>}
             <ColorSelector />
         </div>
     );
 }
 
-function TileRow({y, line, selectPixel, selectedPixel}) {
-    return (
-        <div className='tileRow'>
-            {
-                line.map((color, x) => {
-                    const isSelected = selectedPixel.x === x && selectedPixel.y === y;
-                    return (
-                        <Tile
-                            color={color}
-                            key={x}
-                            selected={isSelected}
-                            onSelect={() => selectPixel(x, y, color)}
-                        />
-                    );
-                })
-            }
-        </div>
-    );
-}
+class PlaceCanvas extends React.Component {
 
-function Tile({color, selected, onSelect}) {
-    const classes = selected ? 'tile selected' : 'tile';
-    return (
-        <div
-            className={classes}
-            style={{backgroundColor: `${color}`}}
-            onClick={onSelect}
-        />
-    );
+    componentDidMount() {
+        this.canvas = document.getElementById('placeCanvas');
+        drawBoard(this.canvas, this.props.colors);
+    }
+
+    onClick(event) {
+        const clickedCoords = getPixelCoordinates(this.canvas, event.pageX, event.pageY);
+
+        const {x, y} = clickedCoords;
+        this.props.selectPixel(x, y, this.props.colors[y][x]);
+    }
+
+    shouldComponentUpdate() {
+        return false;
+    }
+
+    render() {
+        const {colors} = this.props;
+
+        const width = colors[0] ? colors[0].length : 0;
+        const height = colors.length;
+        return (
+            <canvas
+                className='place'
+                id='placeCanvas'
+                width={width * PIXEL_SIZE}
+                height={height * PIXEL_SIZE}
+                onClick={(event) => this.onClick(event)}
+            />
+        );
+    }
 }
 
 export const ThePlace = connect(
     (state, ownProps) => ({
-        board: state.board,
-        colorSelector: state.colorSelector
+        board: state.board
     }),
     dispatch => bindActionCreators({selectPixel}, dispatch)
 )(ThePlaceComponent);

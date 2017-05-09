@@ -2,6 +2,7 @@ import moment from "moment";
 import uuid from "../lib/uuid";
 import {combineReducers} from "redux";
 import * as ActionTypes from "../actions/actionTypes";
+import {drawNewPixel} from "../lib/canvas";
 
 
 const initialBoardState = {
@@ -9,12 +10,16 @@ const initialBoardState = {
     colors: []
 };
 
+
 function board(state = initialBoardState, action) {
     switch (action.type) {
         case ActionTypes.PIXEL_UPDATED:
             const updatedPixels = state.colors;
             for (let pixel of action.pixels) {
                 updatedPixels[pixel.y][pixel.x] = pixel.color;
+
+                const canvas = document.getElementById('placeCanvas');
+                drawNewPixel(canvas, pixel.x, pixel.y, pixel.color);
             }
             return {
                 ...state,
