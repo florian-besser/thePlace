@@ -1,0 +1,29 @@
+version: '3'
+services:
+  redis:
+    image: "redis"
+    hostname: redis
+    ports:
+     - 6379:6379
+  rabbitmq:
+    image: "rabbitmq:management"
+    hostname: rabbitmq
+    ports:
+     - 5672:5672
+     - 15672:15672
+    volumes:
+     - /var/lib/rabbitmq:/var/lib/rabbitmq
+  backend:
+    build: backend
+    links:
+     - redis
+     - rabbitmq
+    ports:
+     - 2222:2222
+    environment:
+     TARGET_HOST_REDIS: redis
+     TARGET_HOST_RABBITMQ: rabbitmq
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
