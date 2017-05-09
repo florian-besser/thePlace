@@ -13,9 +13,12 @@ public class WebsocketFactory {
     private static final URI TARGET = create("ws://" + RandomBot.TARGET_HOST + "/events/");
     private static final WebSocketClient client = new WebSocketClient();
 
+
     public static EventSocketCounter getCounterInstance() throws Exception {
-        if (!client.isStarted())
+        if (!client.isStarted()) {
+            client.setMaxTextMessageBufferSize(10*1024*1024);
             client.start();
+        }
 
         // The socket that receives events
         EventSocketCounter socket = new EventSocketCounter();
