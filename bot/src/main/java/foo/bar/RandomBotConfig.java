@@ -1,24 +1,22 @@
 package foo.bar;
 
-import javax.imageio.ImageIO;
+public enum RandomBotConfig {
 
-public class RandomBotConfig {
-
-    public static RandomBotConfig WEBSOCKET_STRESS = new RandomBotConfig(
+    WEBSOCKET_STRESS(
             1_000,
             10,
             100,
             10_000
-    );
+    ),
 
-    public static RandomBotConfig UI_STRESS = new RandomBotConfig(
+    UI_STRESS(
             1_000_000,
             10,
             1000,
             10
-    );
+    ),
 
-    public static RandomBotConfig IMAGE = new RandomBotConfig(
+    IMAGE(
             10_000,
             2,
             1000,
@@ -31,7 +29,7 @@ public class RandomBotConfig {
     private final int clientThreads;
 
 
-    public RandomBotConfig(int maxRequests, int requesterThreads, int maxRequestsPerSecondPerRequesterThread, int clientThreads) {
+    RandomBotConfig(int maxRequests, int requesterThreads, int maxRequestsPerSecondPerRequesterThread, int clientThreads) {
         this.maxRequests = maxRequests;
         this.requesterThreads = requesterThreads;
         this.maxRequestsPerSecondPerRequesterThread = maxRequestsPerSecondPerRequesterThread;

@@ -27,7 +27,7 @@ public class RandomBot {
     public static final String TARGET_HOST = Config.getBackendTargetHost() + ":2222";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
-    private static final RandomBotConfig config = RandomBotConfig.UI_STRESS;
+    private static final RandomBotConfig config = RandomBotConfig.valueOf(Config.getBotConfig());
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {

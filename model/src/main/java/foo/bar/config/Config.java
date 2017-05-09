@@ -21,4 +21,11 @@ public class Config {
             targetHost = "localhost";
         return targetHost;
     }
+
+    public static String getBotConfig() {
+        String config = System.getenv("BOT_CONFIG");
+        if (config == null || "".equals(config))
+            config = "WEBSOCKET_STRESS";
+        return config;
+    }
 }
