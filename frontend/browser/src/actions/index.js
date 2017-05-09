@@ -46,13 +46,28 @@ export function setColor(x, y, color) {
             })
         });
         return fetch(request)
-            .then(response => dispatch(setColorSuccess()));
+            .then(response => {
+                if (response.status === 200) {
+                    dispatch(setColorSuccess())
+                    dispatch(pixelsUpdated([{
+                        x, y, color
+                    }]))
+                } else {
+                    dispatch(setColorError());
+                }
+            });
     };
 }
 
 export function setColorSuccess() {
     return {
         type: ActionType.SET_COLOR_SUCCESS
+    };
+}
+
+export function setColorError() {
+    return {
+        type: ActionType.SET_COLOR_ERROR
     };
 }
 
@@ -99,7 +114,7 @@ export function loadPlace() {
     }
 }
 
-export function pixelUpdated(data) {
+export function pixelsUpdated(data) {
     return {
         type: ActionType.PIXEL_UPDATED,
         pixels: data

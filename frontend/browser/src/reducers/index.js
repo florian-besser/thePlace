@@ -47,6 +47,7 @@ function user(state = initialUserState) {
 
 const initialColorSelectorState = {
     updatePending: false,
+    setColorError: false,
     selectedPixel: {
         x: undefined,
         y: undefined
@@ -75,7 +76,8 @@ function colorSelector(state = initialColorSelectorState, action) {
         case ActionTypes.SET_COLOR_REQUESTED:
             return {
                 ...state,
-                updatePending: true
+                updatePending: true,
+                setColorError: false
             };
         case ActionTypes.SET_COLOR_SUCCESS:
             const timeoutExpiry = moment().add(10, 'seconds');
@@ -83,15 +85,18 @@ function colorSelector(state = initialColorSelectorState, action) {
                 ...state,
                 updatePending: false,
                 timeoutExpiry: timeoutExpiry,
-                timeoutLeft: timeoutExpiry.diff()
+                timeoutLeft: timeoutExpiry.diff(),
             };
-        case ActionTypes.UPDATE_TIMEOUT:
-            if (state.timeoutExpiry.isSameOrBefore()) {
-                return state;
-            }
+        case ActionTypes.SET_COLOR_ERROR:
             return {
                 ...state,
-                timemoutLeft: Math.max(0, state.timeoutExpiry.diff())
+                updatePending: false,
+                setColorError: true
+            };
+        case ActionTypes.UPDATE_TIMEOUT:
+            return {
+                ...state,
+                timemoutLeft: Math.max(-10000, state.timeoutExpiry.diff())
             };
         default:
             return state;

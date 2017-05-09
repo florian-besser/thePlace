@@ -6,8 +6,8 @@ import {ChromePicker} from "react-color";
 import {setColor, setPickerColor, updateTimeout} from "../actions";
 
 
-function ColorSelectorComponent({colorSelector, setPickerColor, setColor, updateTimeout}) {
-    const {selectedPixel, selectedColor, timeoutExpiry} = colorSelector;
+const ColorSelectorComponent = ReactTimeout(({colorSelector, setPickerColor, setColor, updateTimeout}) => {
+    const {selectedPixel, selectedColor, timeoutExpiry, setColorError} = colorSelector;
     const hasSelectedPixel = !isNaN(selectedPixel.x) && !isNaN(selectedPixel.y);
     if (!hasSelectedPixel) {
         return (
@@ -17,13 +17,18 @@ function ColorSelectorComponent({colorSelector, setPickerColor, setColor, update
         );
     }
 
-    const disabled = timeoutExpiry && timeoutExpiry.isAfter();
+    const diff = timeoutExpiry ? timeoutExpiry.diff() : 0;
+    const disabled = diff > 0;
+    if (disabled) {
+        setTimeout(updateTimeout, 1000);
+    }
 
     return (
         <div className='colorActions'>
             <p>Setting color for pixel {`${selectedPixel.x}/${selectedPixel.y}`} to {selectedColor}</p>
+            {setColorError && <p>Failed to update Pixel.</p>}
             {disabled && <p>Waiting for timeout...</p>}
-            <TimeoutClock timeout={timeoutExpiry} updateTimeout={updateTimeout}/>
+            <TimeoutClock millisRemaining={diff}/>
             {!disabled && (
                 <div>
                     <ChromePicker disableAlpha onChangeComplete={setPickerColor} color={selectedColor}/>
@@ -32,22 +37,17 @@ function ColorSelectorComponent({colorSelector, setPickerColor, setColor, update
             )}
         </div>
     );
-}
+});
 
-const TimeoutClock = ReactTimeout(({timeout, updateTimeout, setTimeout}) => {
-    const diff = timeout ? timeout.diff() : 0;
-    if (diff <= 0) {
+function TimeoutClock ({millisRemaining}) {
+    if (millisRemaining <= 0) {
         return null;
     }
 
-    if (diff > 0) {
-        setTimeout(updateTimeout, 1000);
-    }
-
     return (
-        <span>Wait for {Math.ceil(diff / 1000)} seconds</span>
+        <span>Wait for {Math.ceil(millisRemaining / 1000)} seconds</span>
     );
-});
+};
 
 export const ColorSelector = connect(
     (state, ownProps) => ({
