@@ -8,8 +8,6 @@ import foo.bar.rest.CORSResponseFilter;
 import foo.bar.websocket.EventServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -53,7 +51,6 @@ public class App {
             LOGGER.info("Preparing to listen to RabbitMQ");
             // Start copying messages from Topic to our own Queue
             Channel channel = MessageFactory.getChannel();
-            LOGGER.info("Listening to RabbitMQ");
 
             // Start consuming our queue
             LOGGER.info("Starting to consume RabbitMQ messages");

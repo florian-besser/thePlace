@@ -37,6 +37,7 @@ function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor}) {
                 color={board.pickerColor}
                 setPickerColor={setPickerColor}
                 onSetColor={onSetColor}
+                disabled={board.timeoutExpiry && board.timeoutExpiry.isAfter()}
             />
         </div>
     );
@@ -53,7 +54,7 @@ function Tile({color, selected, onSelect}) {
     );
 }
 
-function ColorSelector({x, y, color, setPickerColor, onSetColor}) {
+function ColorSelector({x, y, color, setPickerColor, onSetColor, disabled}) {
     const hasSelectedPixel = !isNaN(x) && !isNaN(y);
     if (!hasSelectedPixel) {
         return (
@@ -66,6 +67,7 @@ function ColorSelector({x, y, color, setPickerColor, onSetColor}) {
     return (
         <div className='colorActions'>
             <p>Setting color for pixel {`${x}/${y}`} to {color}</p>
+            {disabled && <p>Waiting for timeout...</p>}
             <ChromePicker disableAlpha onChangeComplete={setPickerColor} color={color}/>
             <button onClick={() => onSetColor(x, y, color)}>Save</button>
         </div>

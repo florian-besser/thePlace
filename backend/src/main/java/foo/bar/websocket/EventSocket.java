@@ -49,7 +49,7 @@ public class EventSocket extends WebSocketAdapter
         try {
             voidFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to send message: " + text, e);
         }
         LOGGER.info("Sent message: " + text);
     }

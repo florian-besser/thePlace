@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.awt.*;
 import java.util.Set;
 
 @Path("thePlace")
@@ -107,19 +106,4 @@ public class Resource {
         }
     }
 
-    private static class PutPixelBody {
-        @NotNull
-        private String color;
-
-        @NotNull
-        private String user;
-
-        public String getColor() {
-            return color;
-        }
-
-        public String getUser() {
-            return user;
-        }
-    }
 }
