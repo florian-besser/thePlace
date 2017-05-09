@@ -12,26 +12,13 @@ function ThePlaceComponent({board, selectPixel, setPickerColor, setColor, update
     const width = board.colors[0] ? board.colors[0].length : 0;
     const height = board.colors.length;
     const selectedPixel = board.selectedPixel;
-    const tiles = [];
-
-    board.colors.forEach((line, y) => {
-        line.forEach((color, x) => {
-            const isSelected = selectedPixel.x === x && selectedPixel.y === y;
-            tiles.push(
-                <Tile
-                    color={color}
-                    key={`${x}-${y}`}
-                    selected={isSelected}
-                    onSelect={() => selectPixel(x, y, color)}
-                />
-            );
-        });
-    });
 
     return (
         <div>
             <div className='place' style={{width: width * PIXEL_SIZE, height: height * PIXEL_SIZE}}>
-                {tiles}
+                {board.colors.map((line, y) => (
+                    <TileRow key={y} y={y} line={line} selectPixel={selectPixel} selectedPixel={selectedPixel}/>
+                ))}
             </div>
             <ColorSelector
                 x={selectedPixel.x}
@@ -42,6 +29,26 @@ function ThePlaceComponent({board, selectPixel, setPickerColor, setColor, update
                 timeoutExpiry={board.timeoutExpiry}
                 updateTimeout={updateTimeout}
             />
+        </div>
+    );
+}
+
+function TileRow({y, line, selectPixel, selectedPixel}) {
+    return (
+        <div className='tileRow'>
+            {
+                line.map((color, x) => {
+                    const isSelected = selectedPixel.x === x && selectedPixel.y === y;
+                    return (
+                        <Tile
+                            color={color}
+                            key={x}
+                            selected={isSelected}
+                            onSelect={() => selectPixel(x, y, color)}
+                        />
+                    );
+                })
+            }
         </div>
     );
 }

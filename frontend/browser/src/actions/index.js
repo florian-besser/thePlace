@@ -28,7 +28,7 @@ export function selectPixel(x, y, color) {
 export function setPickerColor(color) {
     return {
         type: ActionType.SET_PICKER_COLOR,
-        color: color
+        color: color.hex
     };
 }
 
@@ -83,7 +83,7 @@ export function loadPlaceError() {
 export function loadPlaceSuccess(body) {
     return {
         type: ActionType.LOAD_PLACE_SUCCESS,
-        ...body
+        body: body
     };
 }
 

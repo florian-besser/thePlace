@@ -63,7 +63,7 @@ function board(state = initialBoardState, action) {
             return {
                 ...state,
                 isFetching: false,
-                colors: action.colors
+                colors: action.body.colors
             };
         case ActionTypes.SELECT_PIXEL:
             return {
