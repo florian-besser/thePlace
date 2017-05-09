@@ -4,6 +4,10 @@ body {
   font-family: sans-serif;
 }
 
+#placeCanvas {
+  cursor: pointer;
+}
+
 .tileRow {
   margin: 0;
   padding: 0;
