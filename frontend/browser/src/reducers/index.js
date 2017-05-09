@@ -40,7 +40,7 @@ function board(state = initialBoardState, action) {
                 timeoutExpiry: moment().add(10, 'seconds')
             };
         case ActionTypes.PIXEL_UPDATED:
-            const updatedPixels = [...state.colors];
+            const updatedPixels = state.colors;
             updatedPixels[action.y][action.x] = action.color;
             return {
                 ...state,
