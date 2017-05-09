@@ -37,7 +37,7 @@ public class MessageReceiver extends DefaultConsumer {
         // Update board
         BoardHolder.THE_BOARD.setPixel(pixel);
 
-        BoardHolder.UI.updateBoard(pixel);
+        //BoardHolder.UI.updateBoard(pixel);
 
         // Send Websocket messages
         UpdateBatching.getInstance().addUpdate(pixel);
