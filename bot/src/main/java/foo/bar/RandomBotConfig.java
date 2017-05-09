@@ -10,7 +10,7 @@ public class RandomBotConfig {
     );
 
     public static RandomBotConfig UI_STRESS = new RandomBotConfig(
-            10_000,
+            1_000_000,
             10,
             1000,
             10
