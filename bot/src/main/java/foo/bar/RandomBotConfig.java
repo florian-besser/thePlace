@@ -1,6 +1,12 @@
 package foo.bar;
 
 public enum RandomBotConfig {
+    QUICK_TEST(
+            1_000,
+            10,
+            100,
+            10
+    ),
 
     WEBSOCKET_STRESS(
             1_000,
