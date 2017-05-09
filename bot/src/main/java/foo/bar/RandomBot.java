@@ -24,10 +24,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBot {
-    public static final String TARGET_HOST = "192.168.2.96:2222";
-    public static final int MAX_REQUESTS = 1000;
-    public static final int MAX_REQUESTS_PER_SECOND = 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
+    private static final String TARGET_HOST = "192.168.2.96:2222";
+    private static final int MAX_REQUESTS = 1000;
+    private static final int MAX_REQUESTS_PER_SECOND = 10;
     private static RateLimiter throttle = RateLimiter.create(MAX_REQUESTS_PER_SECOND);
     private static ThreadLocalRandom current = ThreadLocalRandom.current();
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
