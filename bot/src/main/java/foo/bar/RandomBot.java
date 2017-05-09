@@ -24,6 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBot {
     public static final int MAX_REQUESTS = 1000;
+    public static final String TARGET_HOST = "localhost:2222";
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static ThreadLocalRandom current = ThreadLocalRandom.current();
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
@@ -50,7 +51,7 @@ public class RandomBot {
     }
 
     private static EventSocketListener getSocket() throws Exception {
-        URI uri = URI.create("ws://localhost:2222/events/");
+        URI uri = URI.create("ws://" + TARGET_HOST + "/events/");
 
         WebSocketClient client = new WebSocketClient();
         client.start();
@@ -69,7 +70,7 @@ public class RandomBot {
     }
 
     private static Board getBoard() {
-        WebTarget webTarget = client.target("http://localhost:2222/rest/thePlace").path("place");
+        WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place");
 
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
         Response response = invocationBuilder.get();
@@ -90,7 +91,7 @@ public class RandomBot {
     private static void putPixel(int xMax, int yMax) {
         int x = current.nextInt(0, xMax);
         int y = current.nextInt(0, yMax);
-        WebTarget webTarget = client.target("http://localhost:2222/rest/thePlace").path("place")
+        WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place")
                 .path(Integer.toString(x))
                 .path(Integer.toString(y));
 
