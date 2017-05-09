@@ -28,7 +28,7 @@ public class MessageReceiver extends DefaultConsumer {
     public void handleDelivery(String consumerTag, Envelope envelope,
                                AMQP.BasicProperties properties, byte[] body) throws IOException {
         String message = new String(body, "UTF-8");
-        LOGGER.info(" [x] Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+        LOGGER.debug("Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 
         ObjectMapper mapper = new ObjectMapper();
         Pixel pixel = mapper.readValue(message, Pixel.class);
