@@ -1,5 +1,7 @@
 package foo.bar;
 
+import javax.imageio.ImageIO;
+
 public class RandomBotConfig {
 
     public static RandomBotConfig WEBSOCKET_STRESS = new RandomBotConfig(
@@ -10,10 +12,17 @@ public class RandomBotConfig {
     );
 
     public static RandomBotConfig UI_STRESS = new RandomBotConfig(
-            10_000,
+            1_000_000,
             10,
             1000,
             10
+    );
+
+    public static RandomBotConfig IMAGE = new RandomBotConfig(
+            10_000,
+            2,
+            1000,
+            1
     );
 
     private final int maxRequests;

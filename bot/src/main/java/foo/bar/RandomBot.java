@@ -1,7 +1,8 @@
 package foo.bar;
 
+import foo.bar.client.ImagePixelPutter;
 import foo.bar.client.PixelPutter;
-import foo.bar.config.Config;
+import foo.bar.client.RandomPixelPutter;
 import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;

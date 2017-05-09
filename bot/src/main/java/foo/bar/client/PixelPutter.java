@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PixelPutter implements Runnable {
+public abstract class PixelPutter implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PixelPutter.class);
     private RandomBotConfig config;
     private final int xMax;
@@ -55,17 +55,19 @@ public class PixelPutter implements Runnable {
         PutPixelBody entity = new PutPixelBody();
         UUID idOne = UUID.randomUUID();
         entity.setUser(idOne.toString());
-        entity.setColor("#" + getRandomHexString(6));
+        entity.setColor(getColor(x, y));
         invocationBuilder.put(Entity.json(entity));
         LOGGER.debug("Updated Pixel " + x + " " + y);
     }
 
-    private String getRandomHexString(int numchars) {
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < numchars) {
-            sb.append(Integer.toHexString(current.nextInt(0, 16)));
-        }
+    protected abstract String getColor(int x, int y);
 
-        return sb.toString().substring(0, numchars);
+
+    protected int getXMax() {
+        return xMax;
+    }
+
+    protected int getYMax() {
+        return yMax;
     }
 }
