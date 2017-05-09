@@ -7,7 +7,7 @@ const REST_API = '//' + API_HOST + '/rest/thePlace';
 const request_options = {};
 
 /*
-    action creators
+ action creators
  */
 
 export function updateTimeout() {
@@ -15,6 +15,27 @@ export function updateTimeout() {
         type: ActionType.UPDATE_TIMEOUT
     };
 }
+
+export const loadTimeout = () =>
+    (dispatch) => {
+        dispatch(requestTimeout());
+        return fetch(REST_API + `/timeout`)
+            .then(response => response.json())
+            .then(seconds => dispatch(
+                loadTimeoutSuccess(seconds))
+            );
+    };
+
+
+export const requestTimeout = () => ({
+    type: ActionType.REQUEST_TIMEOUT
+});
+
+export const loadTimeoutSuccess = (timeoutSeconds) => ({
+    type: ActionType.LOAD_TIMEOUT_SUCCESS,
+    seconds: timeoutSeconds
+});
+
 
 export function selectPixel(x, y, color) {
     return {
@@ -48,7 +69,7 @@ export function setColor(x, y, color) {
         return fetch(request)
             .then(response => {
                 if (response.status === 200) {
-                    dispatch(setColorSuccess())
+                    dispatch(setColorSuccess());
                     dispatch(pixelsUpdated([{
                         x, y, color
                     }]))

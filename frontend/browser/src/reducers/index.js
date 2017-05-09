@@ -55,6 +55,7 @@ const initialColorSelectorState = {
     selectedColor: undefined,
     timeoutExpiry: undefined,
     timeoutLeft: undefined, // millis until timeout is over (used to trigger rerender)
+    timeoutSeconds: 10
 };
 
 function colorSelector(state = initialColorSelectorState, action) {
@@ -97,6 +98,11 @@ function colorSelector(state = initialColorSelectorState, action) {
             return {
                 ...state,
                 timemoutLeft: Math.max(-10000, state.timeoutExpiry.diff())
+            };
+        case ActionTypes.LOAD_TIMEOUT_SUCCESS:
+            return {
+                ...state,
+                timeoutSeconds: action.seconds
             };
         default:
             return state;

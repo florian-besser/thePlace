@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import {Provider} from 'react-redux';
 import {createStore, applyMiddleware} from 'redux';
-import {loadPlace} from './actions';
+import {loadPlace, loadTimeout} from './actions';
 import {init as websocketInit} from './actions/websocket';
 import rootReducer from  './reducers';
 import './index.css';
@@ -21,8 +21,9 @@ const store = createStore(
     )
 );
 
-store.dispatch(loadPlace());
 websocketInit(store);
+store.dispatch(loadTimeout());
+store.dispatch(loadPlace());
 
 ReactDOM.render(
     <Provider store={store}>
