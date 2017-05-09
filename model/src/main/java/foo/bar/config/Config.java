@@ -25,7 +25,7 @@ public class Config {
     public static String getBotConfig() {
         String config = System.getenv("BOT_CONFIG");
         if (config == null || "".equals(config))
-            config = "WEBSOCKET_STRESS";
+            config = "UI_STRESS";
         return config;
     }
 }

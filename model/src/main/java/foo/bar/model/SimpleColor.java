@@ -12,7 +12,17 @@ public class SimpleColor {
     }
 
     public SimpleColor(String color) {
+        checkColor(color);
         this.color = color;
+    }
+
+    private void checkColor(String color) {
+        if (!color.startsWith("#")) {
+            throw new IllegalArgumentException("Color code must start with hash");
+        }
+        if (color.length() != 7) {
+            throw new IllegalArgumentException("Color code must be 7 characters");
+        }
     }
 
     @JsonCreator
@@ -26,6 +36,7 @@ public class SimpleColor {
     }
 
     public void setColor(String color) {
+        checkColor(color);
         this.color = color;
     }
 

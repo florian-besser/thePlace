@@ -10,7 +10,7 @@ public class RandomPixelPutter extends PixelPutter {
     }
 
     private String getColor() {
-        return getRandomHexString(6);
+        return "#" + getRandomHexString(6);
     }
 
     private String getRandomHexString(int numchars) {
