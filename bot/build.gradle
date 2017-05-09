@@ -5,8 +5,13 @@ repositories {
 }
 
 dependencies {
+    compile project(':model')
+
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.25.1'
+
     //Manual test WS client
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.5.v20170502'
 
-    compile project(':backend')
+    // Guava for rate limiting
+    compile 'com.google.guava:guava:21.0'
 }

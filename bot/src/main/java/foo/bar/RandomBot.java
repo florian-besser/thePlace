@@ -1,7 +1,7 @@
 package foo.bar;
 
-import foo.bar.board.Board;
 import foo.bar.client.PixelPutter;
+import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
 import foo.bar.websocket.EventSocketCounter;
@@ -71,6 +71,8 @@ public class RandomBot {
         for (EventSocketCounter c : clients) {
             c.getSession().close();
         }
+        client.close();
+        LOGGER.info("Closed stuff");
     }
 
     private static Board getBoard() {
@@ -100,7 +102,7 @@ public class RandomBot {
 
     private static void assertEqualMessages(EventSocketListener socket, List<EventSocketCounter> clients) {
         boolean anyFailed = false;
-        int expected = socket.getSetPixels().size();
+        int expected = socket.getMsgsReceived();
         for (EventSocketCounter c : clients) {
             int actual = c.getMsgsReceived();
             if (actual != expected) {

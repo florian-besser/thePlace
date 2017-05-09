@@ -1,6 +1,6 @@
 package persistence;
 
-import foo.bar.board.BoardDimensions;
+import foo.bar.model.BoardDimensions;
 import foo.bar.model.SimpleColor;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -44,10 +44,14 @@ public class RedisStore {
 
     private void initBoardIfNotExists(Jedis jedis, BoardDimensions dimensions) {
         if (!jedis.exists(COLORS)) {
-            byte[] bytes = new byte[dimensions.getSizeInBytes()];
+            byte[] bytes = new byte[getSizeInBytes(dimensions)];
 //            System.out.println("Creating board with " + bytes.length + " bytes size");
             jedis.set(COLORS, SafeEncoder.encode(bytes));
         }
+    }
+
+    private int getSizeInBytes(BoardDimensions dimensions) {
+        return dimensions.getXMaximum() * dimensions.getYMaximum() * RedisStore.BYTES_PER_COLOR;
     }
 
     public SimpleColor[][] getBoardColors(BoardDimensions boardDimensions) {

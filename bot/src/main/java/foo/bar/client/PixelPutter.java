@@ -36,6 +36,7 @@ public class PixelPutter implements Runnable {
         for (int i = 0; i < RandomBot.MAX_REQUESTS / RandomBot.REQUESTER_THREADS; i++) {
             putPixel(xMax, yMax);
         }
+        client.close();
     }
 
     private void putPixel(int xMax, int yMax) {
