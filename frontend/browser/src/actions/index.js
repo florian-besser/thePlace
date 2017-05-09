@@ -16,17 +16,6 @@ export function updateTimeout() {
     };
 }
 
-export const loadTimeout = () =>
-    (dispatch) => {
-        dispatch(requestTimeout());
-        return fetch(REST_API + `/timeout`)
-            .then(response => response.json())
-            .then(seconds => dispatch(
-                loadTimeoutSuccess(seconds))
-            );
-    };
-
-
 export const requestTimeout = () => ({
     type: ActionType.REQUEST_TIMEOUT
 });
@@ -36,6 +25,15 @@ export const loadTimeoutSuccess = (timeoutSeconds) => ({
     seconds: timeoutSeconds
 });
 
+export const loadTimeout = () =>
+    (dispatch) => {
+        dispatch(requestTimeout());
+        return fetch(REST_API + `/timeout`)
+            .then(response => response.json())
+            .then(seconds => dispatch(
+                loadTimeoutSuccess(seconds))
+            );
+    };
 
 export function selectPixel(x, y, color) {
     return {
@@ -131,7 +129,8 @@ export function loadPlace() {
             .then(response => response.json())
             .then(json => {
                 dispatch(loadPlaceSuccess(json));
-            });
+            })
+            .catch(() => dispatch(loadPlaceError()));
     }
 }
 
