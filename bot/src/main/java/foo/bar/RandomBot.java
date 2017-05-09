@@ -102,7 +102,7 @@ public class RandomBot {
 
     private static void assertEqualMessages(EventSocketListener socket, List<EventSocketCounter> clients) {
         boolean anyFailed = false;
-        int expected = socket.getSetPixels().size();
+        int expected = socket.getMsgsReceived();
         for (EventSocketCounter c : clients) {
             int actual = c.getMsgsReceived();
             if (actual != expected) {
