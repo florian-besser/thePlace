@@ -4,9 +4,8 @@ import foo.bar.board.Board;
 import foo.bar.client.PixelPutter;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
+import foo.bar.websocket.EventSocketCounter;
 import foo.bar.websocket.EventSocketListener;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
@@ -18,28 +17,38 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Future;
 
 public class RandomBot {
     public static final String TARGET_HOST = "localhost:2222";
     public static final int MAX_REQUESTS = 1000;
-    public static final int THREADS = 10;
-    public static final int MAX_REQUESTS_PER_SECOND_PER_THREAD = 10;
+    public static final int REQUESTER_THREADS = 10;
+    public static final int MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD = 1000;
+    public static final int CLIENT_THREADS = 500;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
-        EventSocketListener socket = getSocket();
+        EventSocketListener listener = EventSocketListener.getNewInstance();
+
+        LOGGER.info("Reading initial board");
         Board originalBoard = getBoard();
+
+        LOGGER.info("Creating clients");
+        List<EventSocketCounter> clients = new ArrayList<>(CLIENT_THREADS);
+        for (int i = 0; i < CLIENT_THREADS; i++) {
+            clients.add(EventSocketCounter.getNewInstance());
+        }
+
+        LOGGER.info("Starting load test");
         SimpleColor[][] colors = originalBoard.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;
-        List<Thread> threads = new ArrayList<>(THREADS);
-        for (int t = 0; t < THREADS; t++) {
+        List<Thread> threads = new ArrayList<>(REQUESTER_THREADS);
+        for (int t = 0; t < REQUESTER_THREADS; t++) {
             Thread thread = new Thread(new PixelPutter(xMax, yMax));
             thread.start();
             threads.add(thread);
@@ -49,32 +58,19 @@ public class RandomBot {
         for (Thread t : threads) {
             t.join();
         }
+        LOGGER.info("Finished load test");
         Thread.sleep(5000);
 
+        assertEqualMessages(listener, clients);
         Board finishedBoard = getBoard();
-        replayMessagesOn(originalBoard, socket.getSetPixels());
+        replayMessagesOn(originalBoard, listener.getSetPixels());
         assertEquals(originalBoard, finishedBoard);
 
-        socket.getSession().close();
-    }
-
-    private static EventSocketListener getSocket() throws Exception {
-        URI uri = URI.create("ws://" + TARGET_HOST + "/events/");
-
-        WebSocketClient client = new WebSocketClient();
-        client.start();
-        // The socket that receives events
-        EventSocketListener socket = new EventSocketListener();
-        // Attempt Connect
-        Future<Session> fut = client.connect(socket, uri);
-        // Wait for Connect
-        Session session = fut.get();
-
-        // Send a message
-        session.getRemote().sendString("Hello");
-
-        return socket;
-
+        // Close
+        listener.getSession().close();
+        for (EventSocketCounter c : clients) {
+            c.getSession().close();
+        }
     }
 
     private static Board getBoard() {
@@ -99,6 +95,21 @@ public class RandomBot {
     private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {
         for (Pixel p : pixels) {
             originalBoard.setPixelInternal(p);
+        }
+    }
+
+    private static void assertEqualMessages(EventSocketListener socket, List<EventSocketCounter> clients) {
+        boolean anyFailed = false;
+        int expected = socket.getSetPixels().size();
+        for (EventSocketCounter c : clients) {
+            int actual = c.getMsgsReceived();
+            if (actual != expected) {
+                anyFailed = true;
+                LOGGER.warn("A client did not receive all messages. Expected " + expected + " actual " + actual);
+            }
+        }
+        if (!anyFailed) {
+            LOGGER.info("No messages dropped");
         }
     }
 
