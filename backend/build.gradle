@@ -38,10 +38,19 @@ dependencies {
 
 task(buildDocker, type:Exec, dependsOn: distTar) {
     //on linux
-    commandLine "docker", "build", ".", "-t", "backend"
+    commandLine "docker", "build", ".", "-t", "192.168.2.136:5000/backend"
     //extension method stopTomcat.output() can be used to obtain the output:
     ext.output = {
         return standardOutput.toString()
     }
 }
 build.dependsOn buildDocker
+
+task(pushDocker, type:Exec, dependsOn: buildDocker) {
+    //on linux
+    commandLine "docker", "push", "192.168.2.136:5000/backend"
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
