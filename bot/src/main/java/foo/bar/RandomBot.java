@@ -28,7 +28,7 @@ public class RandomBot {
     public static final String TARGET_HOST = "localhost:2222";
     public static final int MAX_REQUESTS = 1000;
     public static final int THREADS = 10;
-    public static final int MAX_REQUESTS_PER_SECOND_PER_THREAD = 10;
+    public static final int MAX_REQUESTS_PER_SECOND_PER_THREAD = 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
@@ -39,6 +39,8 @@ public class RandomBot {
         int xMax = colors[0].length;
         int yMax = colors.length;
         List<Thread> threads = new ArrayList<>(THREADS);
+
+        LOGGER.info("Starting load test");
         for (int t = 0; t < THREADS; t++) {
             Thread thread = new Thread(new PixelPutter(xMax, yMax));
             thread.start();
@@ -49,6 +51,7 @@ public class RandomBot {
         for (Thread t : threads) {
             t.join();
         }
+        LOGGER.info("Finished load test");
         Thread.sleep(5000);
 
         Board finishedBoard = getBoard();

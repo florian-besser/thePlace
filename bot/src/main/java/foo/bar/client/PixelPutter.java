@@ -52,7 +52,7 @@ public class PixelPutter implements Runnable {
         entity.setUser(idOne.toString());
         entity.setColor("#" + getRandomHexString(6));
         invocationBuilder.put(Entity.json(entity));
-        LOGGER.info("Updated Pixel " + x + " " + y);
+        LOGGER.debug("Updated Pixel " + x + " " + y);
     }
 
     private String getRandomHexString(int numchars) {
