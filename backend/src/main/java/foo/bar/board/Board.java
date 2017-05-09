@@ -1,16 +1,11 @@
 package foo.bar.board;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
-import foo.bar.websocket.EventSocket;
-import foo.bar.websocket.PooledSessionCreator;
+import foo.bar.websocket.UpdateBatching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.RedisStore;
-
-import java.util.Set;
 
 public class Board {
     private static final Logger LOGGER = LoggerFactory.getLogger(Board.class);
@@ -50,10 +45,7 @@ public class Board {
         // Change actual Pixel color
         setPixelInternal(toSet);
 
-        // Update all connected clients
-        Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
-        String toSetStr = serialize(toSet);
-        websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+        UpdateBatching.getInstance().addUpdate(toSet);
     }
 
     // Only to be used from this class and Bots!
@@ -61,14 +53,4 @@ public class Board {
         colors[toSet.getY()][toSet.getX()] = toSet.getColor();
     }
 
-    private String serialize(Pixel toSet) {
-        ObjectMapper mapper = new ObjectMapper();
-        String toSetStr;
-        try {
-            toSetStr = mapper.writeValueAsString(toSet);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error wile converting Pixel to String.", e);
-        }
-        return toSetStr;
-    }
 }

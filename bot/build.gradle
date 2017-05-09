@@ -8,8 +8,5 @@ dependencies {
     //Manual test WS client
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.5.v20170502'
 
-    // Guava for rate limiting
-    compile 'com.google.guava:guava:21.0'
-
     compile project(':backend')
 }

@@ -32,4 +32,7 @@ dependencies {
 
     // Redis client
     compile 'redis.clients:jedis:2.9.0'
+
+    // Guava for rate limiting
+    compile 'com.google.guava:guava:21.0'
 }

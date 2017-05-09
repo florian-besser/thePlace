@@ -51,7 +51,9 @@ function board(state = initialBoardState, action) {
             };
         case ActionTypes.PIXEL_UPDATED:
             const updatedPixels = state.colors;
-            updatedPixels[action.y][action.x] = action.color;
+            for (let pixel of action.pixels) {
+                updatedPixels[pixel.y][pixel.x] = pixel.color;
+            }
             return {
                 ...state,
                 colors: updatedPixels
