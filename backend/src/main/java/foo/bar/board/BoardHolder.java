@@ -9,7 +9,7 @@ public class BoardHolder {
     public static final Board THE_BOARD;
 
     static {
-        BoardDimensions boardDimensions = new BoardDimensions(50, 50);
+        BoardDimensions boardDimensions = new BoardDimensions(100, 50);
 
         // Read from Redis
         RedisStore redisStore = new RedisStore();
