@@ -1,5 +1,6 @@
 package persistence;
 
+import foo.bar.config.Config;
 import foo.bar.model.BoardDimensions;
 import foo.bar.model.SimpleColor;
 import redis.clients.jedis.Jedis;
@@ -14,7 +15,7 @@ public class RedisStore {
     public static final String COLORS = "colors";
     public static final int SECONDS = 10;
 
-    private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), "localhost");
+    private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getTargetHost());
     public static int BYTES_PER_COLOR = 3;
 
     public RedisStore() {

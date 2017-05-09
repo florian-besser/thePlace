@@ -4,6 +4,7 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import foo.bar.config.Config;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -33,7 +34,7 @@ public class MessageFactory {
             return;
         }
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost(Config.getTargetHost());
         try {
             Connection connection = factory.newConnection();
             THE_CHANNEL = connection.createChannel();
