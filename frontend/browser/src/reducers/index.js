@@ -3,14 +3,10 @@ import uuid from "../lib/uuid";
 import {combineReducers} from "redux";
 import * as ActionTypes from "../actions/actionTypes";
 
-const BOARD_WIDTH = 50;
-const BOARD_HEIGHT = 50;
 
 const initialBoardState = {
     isFetching: false,
-    colors: [],  // generateRandomBoard(BOARD_WIDTH, BOARD_HEIGHT),
-    xmaximum: BOARD_WIDTH,
-    ymaximum: BOARD_HEIGHT,
+    colors: [],
     updatePending: false,
     selectedPixel: {
         x: undefined,
@@ -67,8 +63,6 @@ function board(state = initialBoardState, action) {
             return {
                 ...state,
                 isFetching: false,
-                xmaximum: action.colors[0].length,
-                ymaximum: action.colors.length,
                 colors: action.colors
             };
         case ActionTypes.SELECT_PIXEL:

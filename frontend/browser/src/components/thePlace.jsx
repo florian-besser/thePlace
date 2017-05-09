@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ReactTimeout from 'react-timeout'
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {ChromePicker} from 'react-color';
 import {setColor, selectPixel, setPickerColor, updateTimeout} from '../actions';
@@ -7,7 +8,7 @@ import {setColor, selectPixel, setPickerColor, updateTimeout} from '../actions';
 
 const PIXEL_SIZE = 10;
 
-function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor, updateTimeout}) {
+function ThePlaceComponent({board, selectPixel, setPickerColor, setColor, updateTimeout}) {
     const width = board.colors[0] ? board.colors[0].length : 0;
     const height = board.colors.length;
     const selectedPixel = board.selectedPixel;
@@ -21,7 +22,7 @@ function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor, up
                     color={color}
                     key={`${x}-${y}`}
                     selected={isSelected}
-                    onSelect={() => onSelectPixel(x, y, color)}
+                    onSelect={() => selectPixel(x, y, color)}
                 />
             );
         });
@@ -37,7 +38,7 @@ function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor, up
                 y={selectedPixel.y}
                 color={board.pickerColor}
                 setPickerColor={setPickerColor}
-                onSetColor={onSetColor}
+                onSetColor={setColor}
                 timeoutExpiry={board.timeoutExpiry}
                 updateTimeout={updateTimeout}
             />
@@ -102,10 +103,5 @@ export const ThePlace = connect(
     (state, ownProps) => ({
         board: state.board
     }),
-    (dispatch, ownProps) => ({
-        onSetColor: (x, y, color) => dispatch(setColor(x, y, color)),
-        onSelectPixel: (x, y, color) => dispatch(selectPixel(x, y, color)),
-        setPickerColor: (color) => dispatch(setPickerColor(color.hex)),
-        updateTimeout: () => dispatch(updateTimeout())
-    })
+    dispatch => bindActionCreators({setColor, selectPixel, setPickerColor, updateTimeout}, dispatch)
 )(ThePlaceComponent);

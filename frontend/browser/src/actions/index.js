@@ -78,11 +78,7 @@ export function loadPlaceError() {
 }
 
 /*
- interface body {
-     pixels: {x: number; y: number; color: string}[],
-     xmaximum: number;
-     ymaximum: number;
- }
+ type body = string[][]
  */
 export function loadPlaceSuccess(body) {
     return {
