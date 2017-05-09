@@ -14,14 +14,14 @@ function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor, up
     const tiles = [];
 
     board.colors.forEach((line, y) => {
-        line.forEach((tile, x) => {
+        line.forEach((color, x) => {
             const isSelected = selectedPixel.x === x && selectedPixel.y === y;
             tiles.push(
                 <Tile
-                    color={tile.color}
+                    color={color}
                     key={`${x}-${y}`}
                     selected={isSelected}
-                    onSelect={() => onSelectPixel(x, y, tile.color)}
+                    onSelect={() => onSelectPixel(x, y, color)}
                 />
             );
         });

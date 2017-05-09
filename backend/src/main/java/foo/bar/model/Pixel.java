@@ -42,4 +42,13 @@ public class Pixel {
     public void setColor(SimpleColor color) {
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "Pixel{" +
+                "x=" + x +
+                ", y=" + y +
+                ", color=" + color +
+                '}';
+    }
 }

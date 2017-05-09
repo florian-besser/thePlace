@@ -41,6 +41,14 @@ public class Resource {
         return websockets.size() + " message(s) sent";
     }
 
+
+    @GET
+    @Path("timeout")
+    @Produces(MediaType.APPLICATION_JSON)
+    public int timeout() {
+        return RedisStore.SECONDS;
+    }
+
     @GET
     @Path("place")
     @Produces(MediaType.APPLICATION_JSON)
@@ -52,7 +60,7 @@ public class Resource {
     @Path("place/{x}/{y}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response putPixel(@PathParam("x") int x, @PathParam("y") int y,
-                         @NotNull PutPixelBody body) {
+                             @NotNull PutPixelBody body) {
         if (body.getColor() == null || body.getUser() == null) {
             return Response.
                     status(Response.Status.BAD_REQUEST).

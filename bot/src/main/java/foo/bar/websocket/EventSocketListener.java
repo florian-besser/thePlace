@@ -2,6 +2,7 @@ package foo.bar.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.RandomBot;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import foo.bar.model.Pixel;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
@@ -47,8 +48,7 @@ public class EventSocketListener extends WebSocketAdapter {
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
         LOGGER.debug("Received TEXT message: " + message);
-        Pixel p = serialize(message);
-        setPixels.add(p);
+        setPixels.addAll(deserialize(message));
     }
 
     @Override
@@ -64,10 +64,11 @@ public class EventSocketListener extends WebSocketAdapter {
     }
 
 
-    private Pixel serialize(String json) {
+    private List<Pixel> deserialize(String json) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(json, Pixel.class);
+            CollectionType javatype = mapper.getTypeFactory().constructCollectionType(List.class, Pixel.class);
+            return mapper.readValue(json, javatype);
         } catch (IOException e) {
             throw new RuntimeException("Error wile converting String to Pixel.", e);
         }

@@ -4,6 +4,8 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../frontend">
       <excludeFolder url="file://$MODULE_DIR$/../../../frontend/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../frontend/browser/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../frontend/browser/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/../../../frontend/build" />
     </content>
     <orderEntry type="inheritedJdk" />

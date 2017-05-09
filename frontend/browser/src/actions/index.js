@@ -106,6 +106,6 @@ export function loadPlace() {
 export function pixelUpdated(data) {
     return {
         type: ActionType.PIXEL_UPDATED,
-        ...data
+        pixels: data
     };
 }
