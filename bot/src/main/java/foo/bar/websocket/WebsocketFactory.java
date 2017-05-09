@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -62,7 +63,7 @@ public class WebsocketFactory {
                 Future<Session> fut = client.connect(socket, TARGET);
                 // Wait for Connect
                 return fut.get();
-            } catch (RuntimeException e) {
+            } catch (RuntimeException | ExecutionException | ConnectException e) {
                 LOGGER.warn("Could not connect to Backend!");
                 if (i == MAX_RETRIES - 1) {
                     throw e;
