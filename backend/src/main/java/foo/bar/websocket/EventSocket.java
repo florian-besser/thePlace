@@ -1,6 +1,5 @@
 package foo.bar.websocket;
 
-import foo.bar.rest.Resource;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.slf4j.Logger;
@@ -11,7 +10,7 @@ import java.util.concurrent.Future;
 
 public class EventSocket extends WebSocketAdapter
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocket.class);
 
     @Override
     public void onWebSocketConnect(Session sess)
@@ -24,7 +23,7 @@ public class EventSocket extends WebSocketAdapter
     public void onWebSocketText(String message)
     {
         super.onWebSocketText(message);
-        LOGGER.info("Received TEXT message: " + message);
+        LOGGER.debug("Received TEXT message: " + message);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class EventSocket extends WebSocketAdapter
     }
 
     public void sendMessage(String text) {
-        LOGGER.info("Sending message: " + text);
+        LOGGER.debug("Sending message: " + text);
         Future<Void> voidFuture = getRemote().sendStringByFuture(text);
         //Do something
         try {
@@ -51,6 +50,6 @@ public class EventSocket extends WebSocketAdapter
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Failed to send message: " + text, e);
         }
-        LOGGER.info("Sent message: " + text);
+        LOGGER.debug("Sent message: " + text);
     }
 }
