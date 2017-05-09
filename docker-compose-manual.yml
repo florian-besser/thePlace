@@ -4,17 +4,17 @@ services:
     image: "redis"
     hostname: redis
     ports:
-     - 6379
+     - 6379:6379
   rabbitmq:
     image: "rabbitmq:management"
     hostname: rabbitmq
     ports:
-     - 5672
-     - 15672
+     - 5672:5672
+     - 15672:15672
   backend:
     image: "192.168.2.136:5000/backend"
     ports:
-     - 2222
+     - 2222:2222
     links:
      - redis
      - rabbitmq
