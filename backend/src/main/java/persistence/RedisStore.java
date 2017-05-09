@@ -70,7 +70,7 @@ public class RedisStore {
                     String hex = String.format("#%02x%02x%02x", red, green, blue);
 
                     SimpleColor color = new SimpleColor(hex);
-                    colors[x][y] = color;
+                    colors[y][x] = color;
                 }
             }
             return colors;

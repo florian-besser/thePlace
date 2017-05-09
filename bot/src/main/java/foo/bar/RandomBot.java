@@ -24,13 +24,11 @@ import java.util.Objects;
 
 public class RandomBot {
     public static final String TARGET_HOST = "localhost:2222";
-    public static final int MAX_REQUESTS = 1_000;
-    public static final int REQUESTER_THREADS = 10;
-    public static final int MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD = 100;
-    public static final int CLIENT_THREADS = 10_000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
+
+    private static final RandomBotConfig config = RandomBotConfig.UI_STRESS;
 
     public static void main(String[] args) throws Exception {
         EventSocketListener listener = WebsocketFactory.getListenerInstance();
@@ -39,8 +37,8 @@ public class RandomBot {
         Board originalBoard = getBoard();
 
         LOGGER.info("Creating clients");
-        List<EventSocketCounter> clients = new ArrayList<>(CLIENT_THREADS);
-        for (int i = 0; i < CLIENT_THREADS; i++) {
+        List<EventSocketCounter> clients = new ArrayList<>(config.getClientThreads());
+        for (int i = 0; i < config.getClientThreads(); i++) {
             clients.add(WebsocketFactory.getCounterInstance());
         }
 
@@ -48,9 +46,9 @@ public class RandomBot {
         SimpleColor[][] colors = originalBoard.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;
-        List<Thread> threads = new ArrayList<>(REQUESTER_THREADS);
-        for (int t = 0; t < REQUESTER_THREADS; t++) {
-            Thread thread = new Thread(new PixelPutter(xMax, yMax));
+        List<Thread> threads = new ArrayList<>(config.getRequesterThreads());
+        for (int t = 0; t < config.getRequesterThreads(); t++) {
+            Thread thread = new Thread(new PixelPutter(config, xMax, yMax));
             thread.start();
             threads.add(thread);
         }
