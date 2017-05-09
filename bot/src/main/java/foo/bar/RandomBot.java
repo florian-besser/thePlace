@@ -1,10 +1,9 @@
 package foo.bar;
 
-import com.google.common.util.concurrent.RateLimiter;
 import foo.bar.board.Board;
+import foo.bar.client.PixelPutter;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
-import foo.bar.rest.PutPixelBody;
 import foo.bar.websocket.EventSocketListener;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -13,23 +12,24 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.client.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBot {
-    public static final String TARGET_HOST = "192.168.2.96:2222";
+    public static final String TARGET_HOST = "localhost:2222";
     public static final int MAX_REQUESTS = 1000;
-    public static final int MAX_REQUESTS_PER_SECOND = 10;
+    public static final int THREADS = 10;
+    public static final int MAX_REQUESTS_PER_SECOND_PER_THREAD = 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
-    private static RateLimiter throttle = RateLimiter.create(MAX_REQUESTS_PER_SECOND);
-    private static ThreadLocalRandom current = ThreadLocalRandom.current();
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
@@ -38,11 +38,17 @@ public class RandomBot {
         SimpleColor[][] colors = originalBoard.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;
-
-        for (int i = 0; i < MAX_REQUESTS; i++) {
-            putPixel(xMax, yMax);
+        List<Thread> threads = new ArrayList<>(THREADS);
+        for (int t = 0; t < THREADS; t++) {
+            Thread thread = new Thread(new PixelPutter(xMax, yMax));
+            thread.start();
+            threads.add(thread);
         }
 
+        // Await
+        for (Thread t : threads) {
+            t.join();
+        }
         Thread.sleep(5000);
 
         Board finishedBoard = getBoard();
@@ -88,31 +94,6 @@ public class RandomBot {
             y++;
         }
         return board;
-    }
-
-    private static void putPixel(int xMax, int yMax) {
-        throttle.acquire();
-        int x = current.nextInt(0, xMax);
-        int y = current.nextInt(0, yMax);
-        WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place")
-                .path(Integer.toString(x))
-                .path(Integer.toString(y));
-
-        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-        PutPixelBody entity = new PutPixelBody();
-        UUID idOne = UUID.randomUUID();
-        entity.setUser(idOne.toString());
-        entity.setColor("#" + getRandomHexString(6));
-        invocationBuilder.put(Entity.json(entity));
-    }
-
-    private static String getRandomHexString(int numchars) {
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < numchars) {
-            sb.append(Integer.toHexString(current.nextInt(0, 16)));
-        }
-
-        return sb.toString().substring(0, numchars);
     }
 
     private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {

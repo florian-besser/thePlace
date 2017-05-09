@@ -17,6 +17,6 @@ public class MessageSender {
         } catch (IOException e) {
             throw new RuntimeException("Error while sending message", e);
         }
-        LOGGER.info(" [x] Sent '" + ROUTING_KEY + "':'" + message + "'");
+        LOGGER.debug("Sent '" + ROUTING_KEY + "':'" + message + "'");
     }
 }

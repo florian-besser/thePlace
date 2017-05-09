@@ -10,6 +10,12 @@ const request_options = {};
     action creators
  */
 
+export function updateTimeout() {
+    return {
+        type: ActionType.UPDATE_TIMEOUT
+    };
+}
+
 export function selectPixel(x, y, color) {
     return {
         type: ActionType.SELECT_PIXEL,

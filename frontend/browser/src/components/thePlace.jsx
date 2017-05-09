@@ -1,12 +1,13 @@
 import * as React from 'react';
+import ReactTimeout from 'react-timeout'
 import {connect} from 'react-redux';
 import {ChromePicker} from 'react-color';
-import {setColor, selectPixel, setPickerColor} from '../actions';
+import {setColor, selectPixel, setPickerColor, updateTimeout} from '../actions';
 
 
 const PIXEL_SIZE = 10;
 
-function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor}) {
+function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor, updateTimeout}) {
     const width = board.colors[0] ? board.colors[0].length : 0;
     const height = board.colors.length;
     const selectedPixel = board.selectedPixel;
@@ -37,7 +38,8 @@ function ThePlaceComponent({board, onSelectPixel, setPickerColor, onSetColor}) {
                 color={board.pickerColor}
                 setPickerColor={setPickerColor}
                 onSetColor={onSetColor}
-                disabled={board.timeoutExpiry && board.timeoutExpiry.isAfter()}
+                timeoutExpiry={board.timeoutExpiry}
+                updateTimeout={updateTimeout}
             />
         </div>
     );
@@ -54,7 +56,7 @@ function Tile({color, selected, onSelect}) {
     );
 }
 
-function ColorSelector({x, y, color, setPickerColor, onSetColor, disabled}) {
+function ColorSelector({x, y, color, setPickerColor, onSetColor, timeoutExpiry, updateTimeout}) {
     const hasSelectedPixel = !isNaN(x) && !isNaN(y);
     if (!hasSelectedPixel) {
         return (
@@ -64,15 +66,37 @@ function ColorSelector({x, y, color, setPickerColor, onSetColor, disabled}) {
         );
     }
 
+    const disabled = timeoutExpiry && timeoutExpiry.isAfter();
+
     return (
         <div className='colorActions'>
             <p>Setting color for pixel {`${x}/${y}`} to {color}</p>
             {disabled && <p>Waiting for timeout...</p>}
-            <ChromePicker disableAlpha onChangeComplete={setPickerColor} color={color}/>
-            <button onClick={() => onSetColor(x, y, color)}>Save</button>
+            <TimeoutClock timeout={timeoutExpiry} updateTimeout={updateTimeout}/>
+            {!disabled && (
+                <div>
+                    <ChromePicker disableAlpha onChangeComplete={setPickerColor} color={color}/>
+                    <button onClick={() => onSetColor(x, y, color)}>Save</button>
+                </div>
+            )}
         </div>
     );
 }
+
+const TimeoutClock = ReactTimeout(({timeout, updateTimeout, setTimeout}) => {
+    const diff = timeout ? timeout.diff() : 0;
+    if (diff <= 0) {
+        return null;
+    }
+
+    if (diff > 0) {
+        setTimeout(updateTimeout, 1000);
+    }
+
+    return (
+        <span>Wait for {Math.ceil(diff / 1000)} seconds</span>
+    );
+});
 
 export const ThePlace = connect(
     (state, ownProps) => ({
@@ -81,6 +105,7 @@ export const ThePlace = connect(
     (dispatch, ownProps) => ({
         onSetColor: (x, y, color) => dispatch(setColor(x, y, color)),
         onSelectPixel: (x, y, color) => dispatch(selectPixel(x, y, color)),
-        setPickerColor: (color) => dispatch(setPickerColor(color.hex))
+        setPickerColor: (color) => dispatch(setPickerColor(color.hex)),
+        updateTimeout: () => dispatch(updateTimeout())
     })
 )(ThePlaceComponent);
