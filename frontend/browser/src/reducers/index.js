@@ -1,54 +1,16 @@
-import moment from 'moment';
+import moment from "moment";
 import uuid from "../lib/uuid";
 import {combineReducers} from "redux";
 import * as ActionTypes from "../actions/actionTypes";
 
-const BOARD_WIDTH = 50;
-const BOARD_HEIGHT = 50;
 
 const initialBoardState = {
     isFetching: false,
-    colors: [],  // generateRandomBoard(BOARD_WIDTH, BOARD_HEIGHT),
-    xmaximum: BOARD_WIDTH,
-    ymaximum: BOARD_HEIGHT,
-    updatePending: false,
-    selectedPixel: {
-        x: undefined,
-        y: undefined
-    },
-    pickerColor: undefined,
-    timeoutExpiry: undefined, // moment when board can be updated again by this user
-    timeoutLeft: undefined, // millis until timeout is over (used to trigger rerender)
+    colors: []
 };
 
 function board(state = initialBoardState, action) {
     switch (action.type) {
-        case ActionTypes.SET_PICKER_COLOR:
-            return {
-                ...state,
-                pickerColor: action.color
-            };
-        case ActionTypes.SET_COLOR_REQUESTED:
-            return {
-                ...state,
-                updatePending: true
-            };
-        case ActionTypes.SET_COLOR_SUCCESS:
-            const timeoutExpiry = moment().add(10, 'seconds');
-            return {
-                ...state,
-                updatePending: false,
-                timeoutExpiry: timeoutExpiry,
-                timeoutLeft: timeoutExpiry.diff()
-            };
-        case ActionTypes.UPDATE_TIMEOUT:
-            if (state.timeoutExpiry.isSameOrBefore()) {
-                return state;
-            }
-            return {
-                ...state,
-                timemoutLeft: Math.max(0, state.timeoutExpiry.diff())
-            };
         case ActionTypes.PIXEL_UPDATED:
             const updatedPixels = state.colors;
             for (let pixel of action.pixels) {
@@ -67,18 +29,7 @@ function board(state = initialBoardState, action) {
             return {
                 ...state,
                 isFetching: false,
-                xmaximum: action.colors[0].length,
-                ymaximum: action.colors.length,
-                colors: action.colors
-            };
-        case ActionTypes.SELECT_PIXEL:
-            return {
-                ...state,
-                selectedPixel: {
-                    x: action.x,
-                    y: action.y
-                },
-                pickerColor: action.color
+                colors: action.body.colors
             };
         default:
             return state;
@@ -94,9 +45,75 @@ function user(state = initialUserState) {
     return state;
 }
 
+const initialColorSelectorState = {
+    updatePending: false,
+    setColorError: false,
+    selectedPixel: {
+        x: undefined,
+        y: undefined
+    },
+    selectedColor: undefined,
+    timeoutExpiry: undefined,
+    timeoutLeft: undefined, // millis until timeout is over (used to trigger rerender)
+    timeoutSeconds: 10
+};
+
+function colorSelector(state = initialColorSelectorState, action) {
+    switch (action.type) {
+        case ActionTypes.SELECT_PIXEL:
+            return {
+                ...state,
+                selectedPixel: {
+                    x: action.x,
+                    y: action.y
+                },
+                selectedColor: action.color
+            };
+        case ActionTypes.SET_PICKER_COLOR:
+            return {
+                ...state,
+                selectedColor: action.color
+            };
+        case ActionTypes.SET_COLOR_REQUESTED:
+            return {
+                ...state,
+                updatePending: true,
+                setColorError: false
+            };
+        case ActionTypes.SET_COLOR_SUCCESS:
+            const timeoutExpiry = moment().add(10, 'seconds');
+            return {
+                ...state,
+                updatePending: false,
+                timeoutExpiry: timeoutExpiry,
+                timeoutLeft: timeoutExpiry.diff(),
+            };
+        case ActionTypes.SET_COLOR_ERROR:
+            return {
+                ...state,
+                updatePending: false,
+                setColorError: true
+            };
+        case ActionTypes.UPDATE_TIMEOUT:
+            return {
+                ...state,
+                timemoutLeft: Math.max(-10000, state.timeoutExpiry.diff())
+            };
+        case ActionTypes.LOAD_TIMEOUT_SUCCESS:
+            return {
+                ...state,
+                timeoutSeconds: action.seconds
+            };
+        default:
+            return state;
+    }
+}
+
+
 const rootReducer = combineReducers({
     board,
-    user
+    user,
+    colorSelector
 });
 
 export default rootReducer;
