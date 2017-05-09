@@ -6,6 +6,7 @@ import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
 import foo.bar.websocket.EventSocketCounter;
 import foo.bar.websocket.EventSocketListener;
+import foo.bar.websocket.WebsocketFactory;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
@@ -23,16 +24,16 @@ import java.util.Objects;
 
 public class RandomBot {
     public static final String TARGET_HOST = "localhost:2222";
-    public static final int MAX_REQUESTS = 1000;
+    public static final int MAX_REQUESTS = 1_000;
     public static final int REQUESTER_THREADS = 10;
-    public static final int MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD = 1000;
-    public static final int CLIENT_THREADS = 500;
+    public static final int MAX_REQUESTS_PER_SECOND_PER_REQUESTER_THREAD = 100;
+    public static final int CLIENT_THREADS = 1_000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
-        EventSocketListener listener = EventSocketListener.getNewInstance();
+        EventSocketListener listener = WebsocketFactory.getListenerInstance();
 
         LOGGER.info("Reading initial board");
         Board originalBoard = getBoard();
@@ -40,7 +41,7 @@ public class RandomBot {
         LOGGER.info("Creating clients");
         List<EventSocketCounter> clients = new ArrayList<>(CLIENT_THREADS);
         for (int i = 0; i < CLIENT_THREADS; i++) {
-            clients.add(EventSocketCounter.getNewInstance());
+            clients.add(WebsocketFactory.getCounterInstance());
         }
 
         LOGGER.info("Starting load test");
@@ -72,6 +73,8 @@ public class RandomBot {
             c.getSession().close();
         }
         client.close();
+        WebsocketFactory.shutdown();
+
         LOGGER.info("Closed stuff");
     }
 
