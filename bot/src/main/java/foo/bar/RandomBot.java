@@ -71,6 +71,8 @@ public class RandomBot {
         for (EventSocketCounter c : clients) {
             c.getSession().close();
         }
+        client.close();
+        LOGGER.info("Closed stuff");
     }
 
     private static Board getBoard() {
