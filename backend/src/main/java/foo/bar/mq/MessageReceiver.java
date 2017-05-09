@@ -5,7 +5,7 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import foo.bar.board.Board;
+import foo.bar.board.BoardHolder;
 import foo.bar.model.Pixel;
 import foo.bar.websocket.UpdateBatching;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class MessageReceiver extends DefaultConsumer {
         Pixel pixel = mapper.readValue(message, Pixel.class);
 
         // Update board
-        Board.THE_BOARD.setPixel(pixel);
+        BoardHolder.THE_BOARD.setPixel(pixel);
 
         // Send Websocket messages
         UpdateBatching.getInstance().addUpdate(pixel);

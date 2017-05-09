@@ -1,13 +1,11 @@
 package persistence;
 
-import foo.bar.board.BoardDimensions;
+import foo.bar.model.BoardDimensions;
 import foo.bar.model.SimpleColor;
 import foo.bar.rest.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-
-import java.awt.*;
 
 public class TestRedis {
     private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
@@ -19,7 +17,7 @@ public class TestRedis {
 
 
         RedisStore redisInterface = new RedisStore();
-        BoardDimensions boardDimensions = BoardDimensions.DEFAULT;
+        BoardDimensions boardDimensions = new BoardDimensions(2, 2);
         redisInterface.resetBoard(boardDimensions);
         for (int x = 0; x < boardDimensions.getXMaximum(); x++) {
             for (int y = 0; y < boardDimensions.getYMaximum(); y++) {

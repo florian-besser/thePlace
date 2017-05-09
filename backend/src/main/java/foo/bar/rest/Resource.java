@@ -2,8 +2,9 @@ package foo.bar.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import foo.bar.board.Board;
-import foo.bar.board.BoardDimensions;
+import foo.bar.board.BoardHolder;
+import foo.bar.model.Board;
+import foo.bar.model.BoardDimensions;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
 import foo.bar.mq.MessageSender;
@@ -53,7 +54,7 @@ public class Resource {
     @Path("place")
     @Produces(MediaType.APPLICATION_JSON)
     public Board place() {
-        return Board.THE_BOARD;
+        return BoardHolder.THE_BOARD;
     }
 
     @PUT
@@ -67,7 +68,7 @@ public class Resource {
                     entity("Color and User must not be null!").
                     build();
         }
-        Board board = Board.THE_BOARD;
+        Board board = BoardHolder.THE_BOARD;
         SimpleColor[][] colors = board.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;

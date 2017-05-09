@@ -1,16 +1,10 @@
-package foo.bar.board;
+package foo.bar.model;
 
-import foo.bar.model.Pixel;
-import foo.bar.model.SimpleColor;
-import foo.bar.websocket.UpdateBatching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import persistence.RedisStore;
 
 public class Board {
     private static final Logger LOGGER = LoggerFactory.getLogger(Board.class);
-
-    public static Board THE_BOARD = new Board(50, 50);
 
     // [Y][X]
     private SimpleColor[][] colors;
@@ -19,13 +13,8 @@ public class Board {
         // Used by Jackson
     }
 
-    private Board(int xMaximum, int yMaximum) {
-        BoardDimensions boardDimensions = new BoardDimensions(xMaximum, yMaximum);
-
-        // Read from Redis
-        RedisStore redisStore = new RedisStore();
-        redisStore.resetBoard(boardDimensions);
-        this.colors = redisStore.getBoardColors(boardDimensions);
+    public Board(SimpleColor[][] boardColors) {
+        colors = boardColors;
     }
 
     // Used by Jackson
@@ -44,8 +33,6 @@ public class Board {
 
         // Change actual Pixel color
         setPixelInternal(toSet);
-
-        UpdateBatching.getInstance().addUpdate(toSet);
     }
 
     // Only to be used from this class and Bots!

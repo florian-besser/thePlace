@@ -1,12 +1,8 @@
 package foo.bar.rest;
 
-import javax.validation.constraints.NotNull;
-
 public class PutPixelBody {
-    @NotNull
     private String color;
 
-    @NotNull
     private String user;
 
     public String getColor() {

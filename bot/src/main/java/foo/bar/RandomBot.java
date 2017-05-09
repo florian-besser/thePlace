@@ -1,7 +1,7 @@
 package foo.bar;
 
-import foo.bar.board.Board;
 import foo.bar.client.PixelPutter;
+import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
 import foo.bar.websocket.EventSocketCounter;
