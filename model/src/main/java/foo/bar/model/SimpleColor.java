@@ -15,6 +15,11 @@ public class SimpleColor {
         this.color = color;
     }
 
+    @JsonCreator
+    public static SimpleColor fromJson(String json) {
+        return new SimpleColor(json);
+    }
+
     @JsonValue
     public String getColor() {
         return color;
@@ -22,11 +27,6 @@ public class SimpleColor {
 
     public void setColor(String color) {
         this.color = color;
-    }
-
-    @JsonCreator
-    public static SimpleColor fromJson(String json) {
-        return new SimpleColor(json);
     }
 
     @Override

@@ -5,8 +5,8 @@ repositories {
 }
 
 dependencies {
+    compile project(':model')
+
     //Manual test WS client
     compile group: 'org.eclipse.jetty.websocket', name: 'websocket-client', version: '9.4.5.v20170502'
-
-    compile project(':backend')
 }
