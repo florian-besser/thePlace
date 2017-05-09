@@ -5,6 +5,7 @@ import foo.bar.config.Config;
 import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
+import foo.bar.util.EventualExecutor;
 import foo.bar.websocket.EventSocketCounter;
 import foo.bar.websocket.EventSocketListener;
 import foo.bar.websocket.WebsocketFactory;
@@ -13,7 +14,6 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -29,7 +29,6 @@ public class RandomBot {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static final RandomBotConfig config = RandomBotConfig.valueOf(Config.getBotConfig());
-    private static final int MAX_RETRIES = 10;
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
@@ -81,28 +80,8 @@ public class RandomBot {
     private static Board getBoard() {
         WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place");
 
-        Response response = null;
-        for (int i = 0; i < MAX_RETRIES; i++) {
-            try {
-                Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-                response = invocationBuilder.get();
-                break;
-            } catch (ProcessingException e) {
-                LOGGER.warn("Could not connect to Backend!");
-                if (i == MAX_RETRIES - 1) {
-                    throw e;
-                } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        //Ignore
-                    }
-                }
-            }
-        }
-        if (response == null) {
-            throw new RuntimeException("Could not connect to Backend!");
-        }
+        EventualExecutor<WebTarget, Response> exec = new EventualExecutor<>();
+        Response response = exec.tryExecute(RandomBot::getResponse, webTarget);
 
         Board board = response.readEntity(Board.class);
         int y = 0;
@@ -115,6 +94,11 @@ public class RandomBot {
             y++;
         }
         return board;
+    }
+
+    private static Response getResponse(WebTarget webTarget) {
+        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
+        return invocationBuilder.get();
     }
 
     private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {

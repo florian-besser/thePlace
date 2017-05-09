@@ -1,6 +1,7 @@
 package foo.bar.websocket;
 
 import foo.bar.RandomBot;
+import foo.bar.util.EventualExecutor;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -20,15 +20,14 @@ public class WebsocketFactory {
 
     private static final URI TARGET = create("ws://" + RandomBot.TARGET_HOST + "/events/");
     private static final WebSocketClient client = new WebSocketClient();
-    private static final int MAX_RETRIES = 30;
-
 
     public static EventSocketCounter getCounterInstance() throws Exception {
         startClientIfNecessary();
 
         // The socket that receives events
         EventSocketCounter socket = new EventSocketCounter();
-        Session session = getSession(socket);
+        EventualExecutor<WebSocketAdapter, Session> exec = new EventualExecutor<>();
+        Session session = exec.tryExecute(WebsocketFactory::getSession, socket);
 
         // Send a message
         session.getRemote().sendString("Hello");
@@ -41,7 +40,8 @@ public class WebsocketFactory {
 
         // The socket that receives events
         EventSocketListener socket = new EventSocketListener();
-        Session session = getSession(socket);
+        EventualExecutor<WebSocketAdapter, Session> exec = new EventualExecutor<>();
+        Session session = exec.tryExecute(WebsocketFactory::getSession, socket);
 
         // Send a message
         session.getRemote().sendString("Hello");
@@ -56,27 +56,15 @@ public class WebsocketFactory {
         }
     }
 
-    private static Session getSession(WebSocketAdapter socket) throws IOException, InterruptedException, ExecutionException {
-        for (int i = 0; i < MAX_RETRIES; i++) {
-            try {
-                // Attempt Connect
-                Future<Session> fut = client.connect(socket, TARGET);
-                // Wait for Connect
-                return fut.get();
-            } catch (RuntimeException | ExecutionException | ConnectException e) {
-                LOGGER.warn("Could not connect to Backend!");
-                if (i == MAX_RETRIES - 1) {
-                    throw e;
-                } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        //Ignore
-                    }
-                }
-            }
+    private static Session getSession(WebSocketAdapter socket) {
+        try {
+            // Attempt Connect
+            Future<Session> fut = client.connect(socket, TARGET);
+            // Wait for Connect
+            return fut.get();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Could not connect to Backend!");
         }
-        throw new RuntimeException("Could not connect to Backend!");
     }
 
     public static void shutdown() throws Exception {
