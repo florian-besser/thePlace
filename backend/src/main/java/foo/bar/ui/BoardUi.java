@@ -32,7 +32,9 @@ public class BoardUi {
 class BoardCanvas extends Canvas {
     private Board board;
 
-    int scaling = 1;
+    int scaling = 5;
+
+    private boolean init = false;
 
     public BoardCanvas(Board board) {
         this.board = board;
@@ -40,12 +42,10 @@ class BoardCanvas extends Canvas {
 
     @Override
     public void paint(Graphics g) {
-//        SimpleColor[][] colors = board.getColors();
-//        for (int x = 0; x < colors[0].length; x++) {
-//            for (int y = 0; y < colors.length; y++) {
-//                drawPixel(g, colors[y][x], x, y);
-//            }
-//        }
+        if (!init) {
+            g.setColor(Color.black);
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
         super.paint(g);
     }
 

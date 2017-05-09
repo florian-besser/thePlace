@@ -11,7 +11,7 @@ public class BoardHolder {
     public static final BoardUi UI;
 
     static {
-        BoardDimensions boardDimensions = new BoardDimensions(1000, 1000);
+        BoardDimensions boardDimensions = new BoardDimensions(100, 100);
 
         // Read from Redis
         RedisStore redisStore = new RedisStore();
