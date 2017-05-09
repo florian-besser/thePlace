@@ -13,6 +13,7 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
@@ -28,6 +29,7 @@ public class RandomBot {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RandomBot.class);
     private static final RandomBotConfig config = RandomBotConfig.valueOf(Config.getBotConfig());
+    private static final int MAX_RETRIES = 10;
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
@@ -79,8 +81,28 @@ public class RandomBot {
     private static Board getBoard() {
         WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place");
 
-        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-        Response response = invocationBuilder.get();
+        Response response = null;
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            try {
+                Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
+                response = invocationBuilder.get();
+                break;
+            } catch (ProcessingException e) {
+                LOGGER.warn("Could not connect to Backend!");
+                if (i == MAX_RETRIES - 1) {
+                    throw e;
+                } else {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        //Ignore
+                    }
+                }
+            }
+        }
+        if (response == null) {
+            throw new RuntimeException("Could not connect to Backend!");
+        }
 
         Board board = response.readEntity(Board.class);
         int y = 0;
