@@ -5,6 +5,11 @@ services:
     hostname: redis
     ports:
      - 6379
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: "redis"
   rabbitmq:
     image: "rabbitmq:management"
     hostname: rabbitmq
@@ -13,6 +18,11 @@ services:
      - 15672
     volumes:
      - /var/lib/rabbitmq:/var/lib/rabbitmq
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: "rabbitmq"
   backend:
     image: "192.168.2.136:5000/backend"
     ports:
@@ -22,9 +32,14 @@ services:
      TARGET_HOST_RABBITMQ: rabbitmq
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       restart_policy:
         condition: on-failure
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: backend
   bot:
     image: "192.168.2.136:5000/bot"
     environment:
@@ -32,6 +47,11 @@ services:
      BOT_CONFIG: QUICK_TEST
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       restart_policy:
         condition: on-failure
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: bot
