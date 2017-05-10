@@ -35,7 +35,7 @@ public class MessageReceiver extends DefaultConsumer {
         Pixel pixel = mapper.readValue(message, Pixel.class);
 
         // Update board
-        BoardHolder.THE_BOARD.setPixel(pixel);
+        BoardHolder.getInstance().setPixel(pixel);
 
         //BoardHolder.UI.updateBoard(pixel);
 

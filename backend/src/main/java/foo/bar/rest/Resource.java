@@ -54,7 +54,7 @@ public class Resource {
     @Path("place")
     @Produces(MediaType.APPLICATION_JSON)
     public Board place() {
-        return BoardHolder.THE_BOARD;
+        return BoardHolder.getInstance();
     }
 
     @PUT
@@ -68,7 +68,7 @@ public class Resource {
                     entity("Color and User must not be null!").
                     build();
         }
-        Board board = BoardHolder.THE_BOARD;
+        Board board = BoardHolder.getInstance();
         SimpleColor[][] colors = board.getColors();
         int xMax = colors[0].length;
         int yMax = colors.length;
