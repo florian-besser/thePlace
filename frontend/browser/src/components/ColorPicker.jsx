@@ -50,8 +50,6 @@ function TimeoutClock ({millisRemaining}) {
 };
 
 export const ColorSelector = connect(
-    (state, ownProps) => ({
-        colorSelector: state.colorSelector
-    }),
+    ({colorSelector}) => ({colorSelector}),
     dispatch => bindActionCreators({setColor, setPickerColor, updateTimeout}, dispatch)
 )(ColorSelectorComponent);
