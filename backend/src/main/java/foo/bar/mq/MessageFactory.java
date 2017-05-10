@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import foo.bar.config.Config;
+import foo.bar.util.EventualExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,22 +38,8 @@ public class MessageFactory {
         if (THE_CHANNEL != null) {
             return;
         }
-        for (int i = 0; i < MAX_RETRIES; i++) {
-            try {
-                setChannel();
-            } catch (RuntimeException e) {
-                LOGGER.warn("Could not connect to RabbitMQ!");
-                if (i == MAX_RETRIES - 1) {
-                    throw e;
-                } else {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        //Ignore
-                    }
-                }
-            }
-        }
+        EventualExecutor<Void, Void> exec = new EventualExecutor<>();
+        exec.tryExecute(x -> setChannel());
     }
 
     private static void setChannel() {

@@ -5,6 +5,7 @@ import foo.bar.config.Config;
 import foo.bar.model.Board;
 import foo.bar.model.Pixel;
 import foo.bar.model.SimpleColor;
+import foo.bar.util.EventualExecutor;
 import foo.bar.websocket.EventSocketCounter;
 import foo.bar.websocket.EventSocketListener;
 import foo.bar.websocket.WebsocketFactory;
@@ -79,8 +80,8 @@ public class RandomBot {
     private static Board getBoard() {
         WebTarget webTarget = client.target("http://" + TARGET_HOST + "/rest/thePlace").path("place");
 
-        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-        Response response = invocationBuilder.get();
+        EventualExecutor<WebTarget, Response> exec = new EventualExecutor<>();
+        Response response = exec.tryExecute(RandomBot::getResponse, webTarget);
 
         Board board = response.readEntity(Board.class);
         int y = 0;
@@ -93,6 +94,11 @@ public class RandomBot {
             y++;
         }
         return board;
+    }
+
+    private static Response getResponse(WebTarget webTarget) {
+        Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
+        return invocationBuilder.get();
     }
 
     private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {
