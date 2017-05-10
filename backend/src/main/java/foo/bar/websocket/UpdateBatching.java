@@ -1,9 +1,11 @@
 package foo.bar.websocket;
 
+import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.RateLimiter;
 import foo.bar.model.Pixel;
+import foo.bar.monitoring.Monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class UpdateBatching extends Thread {
+
+    private final Meter updateWebsockets = Monitoring.registry.meter("ws_sentUpdate");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
 
@@ -67,6 +71,7 @@ public class UpdateBatching extends Thread {
             }
             updates.add(pixel);
         }
+        updateWebsockets.mark(updates.size());
         return serialize(updates);
     }
 
