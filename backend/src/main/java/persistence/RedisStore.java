@@ -1,8 +1,10 @@
 package persistence;
 
+import com.codahale.metrics.Meter;
 import foo.bar.config.Config;
 import foo.bar.model.BoardDimensions;
 import foo.bar.model.SimpleColor;
+import foo.bar.monitoring.Monitoring;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -17,6 +19,8 @@ public class RedisStore {
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getRedisTargetHost());
     public static int BYTES_PER_COLOR = 3;
+    private final Meter setPixel = Monitoring.registry.meter("setPixel");
+    private final Meter tryToSetPixel = Monitoring.registry.meter("tryToSetPixel");
 
     public RedisStore() {
     }
@@ -26,6 +30,7 @@ public class RedisStore {
     }
 
     public void setPixel(BoardDimensions dimensions, int x, int y, SimpleColor color) {
+        setPixel.mark();
         try (Jedis jedis = pool.getResource()) {
             initBoardIfNotExists(jedis, dimensions);
             int offset = calculateOffset(dimensions, x, y) * 8;
@@ -78,6 +83,7 @@ public class RedisStore {
     }
 
     public boolean tryToSetPixel(String userId) {
+        tryToSetPixel.mark();
         try (Jedis jedis = pool.getResource()) {
             String key = "user_" + userId;
             Long setnx = jedis.setnx(key, "user set pixel");

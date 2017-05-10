@@ -1,5 +1,6 @@
 package foo.bar.mq;
 
+import com.codahale.metrics.Meter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -7,6 +8,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import foo.bar.board.BoardHolder;
 import foo.bar.model.Pixel;
+import foo.bar.monitoring.Monitoring;
 import foo.bar.websocket.UpdateBatching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,8 @@ import java.io.IOException;
 
 public class MessageReceiver extends DefaultConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
+
+    private final Meter receivedPixel = Monitoring.registry.meter("rabbit_receivedPixel");
 
     /**
      * Constructs a new instance and records its association to the passed-in channel.
@@ -29,6 +33,7 @@ public class MessageReceiver extends DefaultConsumer {
     public void handleDelivery(String consumerTag, Envelope envelope,
                                AMQP.BasicProperties properties, byte[] body) throws IOException {
         String message = new String(body, "UTF-8");
+        receivedPixel.mark();
         LOGGER.debug("Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 
         ObjectMapper mapper = new ObjectMapper();

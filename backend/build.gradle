@@ -34,6 +34,10 @@ dependencies {
 
     // Guava for rate limiting
     compile 'com.google.guava:guava:21.0'
+
+    // collecting metrics
+    compile 'io.dropwizard.metrics:metrics-core:3.2.2'
+    compile 'io.dropwizard.metrics:metrics-graphite:3.2.2'
 }
 
 task(buildDocker, type:Exec, dependsOn: distTar) {
