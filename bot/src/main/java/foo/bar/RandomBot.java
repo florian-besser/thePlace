@@ -98,7 +98,11 @@ public class RandomBot {
 
     private static Response getResponse(WebTarget webTarget) {
         Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-        return invocationBuilder.get();
+        Response response = invocationBuilder.get();
+        if (response.getStatus() >= 400) {
+            throw new RuntimeException("Received " + response.getStatus() + " status code when doing REST.");
+        }
+        return response;
     }
 
     private static void replayMessagesOn(Board originalBoard, List<Pixel> pixels) {
