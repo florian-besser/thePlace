@@ -47,8 +47,7 @@ public class UpdateBatching extends Thread {
             if (updatesToSend.isEmpty()) {
                 continue;
             }
-            Timer.Context time = updateTime.time();
-            try {
+            try (Timer.Context ignored = updateTime.time()) {
                 String toSetStr = prepareUpdate();
 
                 // Update all connected clients
@@ -58,8 +57,6 @@ public class UpdateBatching extends Thread {
                 eventSockets.addAll(websockets);
                 LOGGER.info("Sending to all websockets: " + toSetStr);
                 websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
-            } finally {
-                time.stop();
             }
         }
     }

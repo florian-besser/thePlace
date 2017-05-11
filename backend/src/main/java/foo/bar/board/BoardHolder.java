@@ -6,8 +6,8 @@ import foo.bar.model.SimpleColor;
 import persistence.RedisStore;
 
 public class BoardHolder {
+    public static final BoardDimensions BOARD_DIMENSIONS = new BoardDimensions(1000, 1000);
     private static Board THE_BOARD;
-    public static final BoardDimensions BOARD_DIMENSIONS = new BoardDimensions(500, 500);
 
     public static Board getInstance() {
         if (THE_BOARD == null) {

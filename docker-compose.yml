@@ -44,8 +44,8 @@ services:
     image: "192.168.2.136:5000/bot"
     environment:
      TARGET_HOST_BACKEND: backend
-     BOT_CONFIG: INFINITE_LOW_POWER
-     BOT_PIXEL_PUTTER_CONFIG: LENA
+     BOT_CONFIG: INFINITE
+     BOT_PIXEL_PUTTER_CONFIG: RANDOM
     deploy:
       mode: replicated
       replicas: 2
