@@ -37,7 +37,7 @@ public class ImagePixelPutter extends PixelPutter {
     protected Pixel getNextPixel() {
         Pixel pixel = new Pixel(x, y, new SimpleColor(getColor(x, y)));
         x++;
-        if (x == getXMax()) {
+        if (x == xEnd) {
             y += 1;
             x = xStart;
         }

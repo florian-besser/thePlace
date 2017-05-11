@@ -38,6 +38,7 @@ dependencies {
     // collecting metrics
     compile 'io.dropwizard.metrics:metrics-core:3.2.2'
     compile 'io.dropwizard.metrics:metrics-graphite:3.2.2'
+    compile 'io.dropwizard.metrics:metrics-jersey2:3.2.2'
 }
 
 task(buildDocker, type:Exec, dependsOn: distTar) {
