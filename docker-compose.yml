@@ -48,7 +48,7 @@ services:
      BOT_PIXEL_PUTTER_CONFIG: RANDOM
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 4
       restart_policy:
         condition: on-failure
     logging:
