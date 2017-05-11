@@ -1,6 +1,6 @@
 package foo.bar.mq;
 
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class MessageReceiver extends DefaultConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
 
-    private final Meter receivedPixel = Monitoring.registry.meter("rabbit_receivedPixel");
+    private final Timer receivedPixel = Monitoring.registry.timer("rabbit.receivedPixel");
 
     /**
      * Constructs a new instance and records its association to the passed-in channel.
@@ -32,19 +32,23 @@ public class MessageReceiver extends DefaultConsumer {
     @Override
     public void handleDelivery(String consumerTag, Envelope envelope,
                                AMQP.BasicProperties properties, byte[] body) throws IOException {
-        String message = new String(body, "UTF-8");
-        receivedPixel.mark();
-        LOGGER.debug("Received '" + envelope.getRoutingKey() + "':'" + message + "'");
+        Timer.Context time = receivedPixel.time();
+        try {
+            String message = new String(body, "UTF-8");
+            LOGGER.debug("Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 
-        ObjectMapper mapper = new ObjectMapper();
-        Pixel pixel = mapper.readValue(message, Pixel.class);
+            ObjectMapper mapper = new ObjectMapper();
+            Pixel pixel = mapper.readValue(message, Pixel.class);
 
-        // Update board
-        BoardHolder.getInstance().setPixel(pixel);
+            // Update board
+            BoardHolder.getInstance().setPixel(pixel);
 
-        //BoardHolder.UI.updateBoard(pixel);
+            //BoardHolder.UI.updateBoard(pixel);
 
-        // Send Websocket messages
-        UpdateBatching.getInstance().addUpdate(pixel);
+            // Send Websocket messages
+            UpdateBatching.getInstance().addUpdate(pixel);
+        } finally {
+            time.stop();
+        }
     }
 }

@@ -1,7 +1,9 @@
 package foo.bar.application;
 
+import com.codahale.metrics.jersey2.InstrumentedResourceMethodApplicationListener;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
+import foo.bar.monitoring.Monitoring;
 import foo.bar.mq.MessageFactory;
 import foo.bar.mq.MessageReceiver;
 import foo.bar.rest.CORSResponseFilter;
@@ -36,6 +38,7 @@ public class App {
         server.setHandler(context);
 
         ResourceConfig config = new ResourceConfig();
+        config.register(new InstrumentedResourceMethodApplicationListener(Monitoring.registry));
         config.packages("foo.bar");
         ServletHolder servlet = new ServletHolder("rs-rest", new ServletContainer(config));
         context.addServlet(servlet, "/rest/*");

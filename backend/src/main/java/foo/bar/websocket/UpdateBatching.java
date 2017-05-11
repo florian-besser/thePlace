@@ -1,6 +1,7 @@
 package foo.bar.websocket;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.RateLimiter;
@@ -15,7 +16,8 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class UpdateBatching extends Thread {
 
-    private final Meter updateWebsockets = Monitoring.registry.meter("ws_sentUpdate");
+    private final Timer updateTime = Monitoring.registry.timer("ws.update.time");
+    private final Meter updateCount = Monitoring.registry.meter("ws.update.count");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
 
@@ -50,15 +52,20 @@ public class UpdateBatching extends Thread {
             if (updatesToSend.isEmpty()) {
                 continue;
             }
-            String toSetStr = prepareUpdate();
+            Timer.Context time = updateTime.time();
+            try {
+                String toSetStr = prepareUpdate();
 
-            // Update all connected clients
-            Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
+                // Update all connected clients
+                Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
 
-            ArrayList<EventSocket> eventSockets = new ArrayList<>();
-            eventSockets.addAll(websockets);
-            LOGGER.info("Sending to all websockets: " + toSetStr);
-            websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+                ArrayList<EventSocket> eventSockets = new ArrayList<>();
+                eventSockets.addAll(websockets);
+                LOGGER.info("Sending to all websockets: " + toSetStr);
+                websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+            } finally {
+                time.stop();
+            }
         }
     }
 
@@ -71,7 +78,7 @@ public class UpdateBatching extends Thread {
             }
             updates.add(pixel);
         }
-        updateWebsockets.mark(updates.size());
+        updateCount.mark(updates.size());
         return serialize(updates);
     }
 

@@ -1,5 +1,6 @@
 package foo.bar.rest;
 
+import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.bar.board.BoardHolder;
@@ -46,12 +47,14 @@ public class Resource {
     @GET
     @Path("timeout")
     @Produces(MediaType.APPLICATION_JSON)
+    @Timed
     public int timeout() {
         return RedisStore.SECONDS;
     }
 
     @GET
     @Path("place")
+    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public Board place() {
         return BoardHolder.getInstance();
@@ -60,6 +63,7 @@ public class Resource {
     @PUT
     @Path("place/{x}/{y}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
     public Response putPixel(@PathParam("x") int x, @PathParam("y") int y,
                              @NotNull PutPixelBody body) {
         if (body.getColor() == null || body.getUser() == null) {

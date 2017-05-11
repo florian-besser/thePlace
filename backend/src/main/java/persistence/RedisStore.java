@@ -1,6 +1,6 @@
 package persistence;
 
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Timer;
 import foo.bar.config.Config;
 import foo.bar.model.BoardDimensions;
 import foo.bar.model.SimpleColor;
@@ -19,8 +19,8 @@ public class RedisStore {
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getRedisTargetHost());
     public static int BYTES_PER_COLOR = 3;
-    private final Meter setPixel = Monitoring.registry.meter("setPixel");
-    private final Meter tryToSetPixel = Monitoring.registry.meter("tryToSetPixel");
+    private final Timer setPixel = Monitoring.registry.timer("setPixel");
+    private final Timer tryToSetPixel = Monitoring.registry.timer("tryToSetPixel");
 
     public RedisStore() {
     }
@@ -30,7 +30,7 @@ public class RedisStore {
     }
 
     public void setPixel(BoardDimensions dimensions, int x, int y, SimpleColor color) {
-        setPixel.mark();
+        Timer.Context time = setPixel.time();
         try (Jedis jedis = pool.getResource()) {
             initBoardIfNotExists(jedis, dimensions);
             int offset = calculateOffset(dimensions, x, y) * 8;
@@ -38,6 +38,8 @@ public class RedisStore {
             int i = Integer.parseInt(color1, 16) & 0xffffff;
 //        System.out.println(offset + " " + i);
             jedis.bitfield("colors", "set", "u24", offset + "", i + "");
+        } finally {
+            time.stop();
         }
     }
 
@@ -83,7 +85,7 @@ public class RedisStore {
     }
 
     public boolean tryToSetPixel(String userId) {
-        tryToSetPixel.mark();
+        Timer.Context time = tryToSetPixel.time();
         try (Jedis jedis = pool.getResource()) {
             String key = "user_" + userId;
             Long setnx = jedis.setnx(key, "user set pixel");
@@ -93,6 +95,8 @@ public class RedisStore {
                 jedis.expire(key, SECONDS);
                 return true;
             }
+        } finally {
+            time.stop();
         }
     }
 
