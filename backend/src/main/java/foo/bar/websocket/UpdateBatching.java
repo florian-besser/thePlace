@@ -43,6 +43,8 @@ public class UpdateBatching extends Thread {
 
     @Override
     public void run() {
+        boolean debugEnabled = LOGGER.isDebugEnabled();
+
         while (true) {
             throttle.acquire();
             if (updatesToSend.isEmpty()) {
@@ -54,9 +56,11 @@ public class UpdateBatching extends Thread {
                 // Update all connected clients
                 Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
 
-                ArrayList<EventSocket> eventSockets = new ArrayList<>();
+                ArrayList<EventSocket> eventSockets = new ArrayList<>(websockets.size());
                 eventSockets.addAll(websockets);
-                LOGGER.info("Sending to all websockets: " + toSetStr);
+                if (debugEnabled) {
+                    LOGGER.debug("Sending to all websockets: " + toSetStr);
+                }
                 websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
             }
         }
