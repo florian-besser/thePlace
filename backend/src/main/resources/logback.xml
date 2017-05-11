@@ -8,6 +8,17 @@
         </encoder>
     </appender>
 
+    <appender name="HISTORY_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>pixelHistory.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS};%msg</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="history.HistoryLogger">
+        <appender-ref ref="HISTORY_FILE"/>
+    </logger>
+
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>

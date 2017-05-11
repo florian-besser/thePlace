@@ -28,4 +28,11 @@ public class Config {
             config = "UI_STRESS";
         return config;
     }
+
+    public static String getBotPixelPutterConfig() {
+        String config = System.getenv("BOT_PIXEL_PUTTER_CONFIG");
+        if (config == null || "".equals(config))
+            config = "RANDOM";
+        return config;
+    }
 }

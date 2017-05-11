@@ -8,8 +8,7 @@ import java.util.List;
 
 public abstract class PixelPutterFactory {
 
-
-    public static PixelPutterFactory IMAGE = new PixelPutterFactory() {
+    public static PixelPutterFactory LENA = new PixelPutterFactory() {
         @Override
         public List<Thread> createPixelPutters(RandomBotConfig config, int xMax, int yMax, String s) throws IOException {
             List<Thread> threads = new ArrayList<>(config.getRequesterThreads());
@@ -21,7 +20,6 @@ public abstract class PixelPutterFactory {
             return threads;
         }
     };
-
     public static PixelPutterFactory RANDOM = new PixelPutterFactory() {
         @Override
         public List<Thread> createPixelPutters(RandomBotConfig config, int xMax, int yMax, String s) throws IOException {
@@ -35,6 +33,16 @@ public abstract class PixelPutterFactory {
         }
     };
 
+    public static PixelPutterFactory forValue(String v) {
+        switch (v) {
+            case "LENA":
+                return LENA;
+            case "RANDOM":
+                return RANDOM;
+            default:
+                throw new RuntimeException("Unknown value " + v);
+        }
+    }
 
     public abstract List<Thread> createPixelPutters(RandomBotConfig config, int xMax, int yMax, String s)
             throws IOException;

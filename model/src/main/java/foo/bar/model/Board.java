@@ -1,5 +1,6 @@
 package foo.bar.model;
 
+import history.HistoryLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ public class Board {
     public void setPixel(Pixel toSet) {
         LOGGER.info("Updating Pixel LOCALLY at " + toSet.getX() + " " + toSet.getY() +
                 " with Color " + toSet.getColor());
+        HistoryLogger.logPixelSet(toSet.getX(), toSet.getY(), toSet.getColor());
 
         // Change actual Pixel color
         setPixelInternal(toSet);

@@ -2,7 +2,9 @@ import fetch from 'isomorphic-fetch'
 import parse from 'url-parse';
 import * as ActionType from "./actionTypes";
 
-export const API_HOST = parse(window.location).hostname + ':2222';
+const WINDOW_LOCATION = parse(window.location);
+export const API_PORT = process.env.NODE_ENV === 'develop' ? 2222 : WINDOW_LOCATION.port;
+export const API_HOST = WINDOW_LOCATION.hostname + ':' + API_PORT;
 const REST_API = '//' + API_HOST + '/rest/thePlace';
 const request_options = {};
 

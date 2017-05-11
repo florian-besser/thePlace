@@ -7,8 +7,13 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    dockerBuildTime
+}
+
 dependencies {
     compile project(':model')
+    dockerBuildTime project(path: ':frontend', configuration: 'archives')
 
     //Basic Jetty
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.5.v20170502'
@@ -41,7 +46,13 @@ dependencies {
     compile 'io.dropwizard.metrics:metrics-jersey2:3.2.2'
 }
 
-task(buildDocker, type:Exec, dependsOn: distTar) {
+
+task(getFrontend, type: Copy, dependsOn: ":frontend:distZip") {
+    from configurations.dockerBuildTime.files
+    into project.buildDir
+}
+
+task(buildDocker, type:Exec, dependsOn: [distTar, getFrontend]) {
     //on linux
     commandLine "docker", "build", ".", "-t", "192.168.2.136:5000/backend"
     //extension method stopTomcat.output() can be used to obtain the output:

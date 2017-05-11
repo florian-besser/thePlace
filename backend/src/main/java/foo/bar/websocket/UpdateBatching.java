@@ -20,31 +20,31 @@ import java.util.stream.Collectors;
 
 public class UpdateBatching extends Thread {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
+    public static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
+    private static final int MAX_UPDATES_PER_SECOND = 5;
+    private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
+    private static UpdateBatching instance = null;
     private final Timer updateTime = Monitoring.registry.timer("ws.update.time");
     private final Meter updateCount = Monitoring.registry.meter("ws.update.count");
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
-
     private final ConcurrentLinkedDeque<Pixel> updatesToSend = new ConcurrentLinkedDeque<>();
-
-    private static final int MAX_UPDATES_PER_SECOND = 2;
-
-    private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
-
-    private static UpdateBatching instance = null;
 
     private UpdateBatching() {
         setDaemon(true);
     }
 
-    public static final UpdateBatching getInstance() {
+    public static UpdateBatching getInstance() {
+        if (instance == null) {
+            startInstance();
+        }
+        return instance;
+    }
+
+    private static synchronized void startInstance() {
         if (instance == null) {
             instance = new UpdateBatching();
             instance.start();
         }
-        return instance;
     }
 
     public void addUpdate(Pixel update) {
@@ -53,21 +53,24 @@ public class UpdateBatching extends Thread {
 
     @Override
     public void run() {
+        boolean debugEnabled = LOGGER.isDebugEnabled();
+
         while (true) {
             throttle.acquire();
             if (updatesToSend.isEmpty()) {
                 continue;
             }
-            Timer.Context time = updateTime.time();
-            try {
+            try (Timer.Context ignored = updateTime.time()) {
                 String toSetStr = prepareUpdate();
 
                 // Update all connected clients
                 Set<EventSocket> websockets = PooledSessionCreator.getWebsockets();
 
-                ArrayList<EventSocket> eventSockets = new ArrayList<>();
+                ArrayList<EventSocket> eventSockets = new ArrayList<>(websockets.size());
                 eventSockets.addAll(websockets);
-                LOGGER.info("Sending to all websockets: " + toSetStr);
+                if (debugEnabled) {
+                    LOGGER.debug("Sending to all websockets: " + toSetStr);
+                }
                 List<Future<Void>> futures = websockets.stream()
                         .map(eventSocket -> eventSocket.sendMessageAsync(toSetStr))
                         .collect(Collectors.toList());
@@ -78,8 +81,6 @@ public class UpdateBatching extends Thread {
                         LOGGER.warn("Could not send message to client", e);
                     }
                 });
-            } finally {
-                time.stop();
             }
         }
     }
@@ -100,7 +101,7 @@ public class UpdateBatching extends Thread {
     private String serialize(Object o) {
         String toSetStr;
         try {
-            toSetStr = mapper.writeValueAsString(o);
+            toSetStr = MAPPER.writeValueAsString(o);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error wile converting Pixel to String.", e);
         }
