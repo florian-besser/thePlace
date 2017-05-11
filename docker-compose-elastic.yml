@@ -6,12 +6,9 @@ services:
      - 9200:9200
 
   logstash:
-    image: "docker.elastic.co/logstash/logstash:5.4.0"
+    image: "192.168.2.136:5000/logstash"
     ports:
      - 12201:12201/udp
-    volumes:
-     - /var/lib/logstash:/config-dir
-    command: ["logstash", "-f", "/config-dir/logstash.conf"]
     deploy:
       mode: global
 
@@ -19,6 +16,9 @@ services:
     image: "docker.elastic.co/kibana/kibana:5.4.0"
     ports:
      - 5601:5601
+    environment:
+      XPACK_SECURITY_ENABLED: "false"
+      XPACK_SECURITY_SESSIONTIMEOUT: 36000000 #10 Hours = 36000 seconds = 36_000_000 milliseconds
     deploy:
       mode: global
 
