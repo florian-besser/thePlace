@@ -49,15 +49,12 @@ public class BoardUi {
         jFrame.setSize(1000, 1000);
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        new Timer(250, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LOGGER.info("Updating");
-                com.codahale.metrics.Timer.Context time = READ.time();
-                byte[] colors = redisStore.getRgbImage();
-                time.stop();
-                boardCanvas.paintColors(colors);
-            }
+        new Timer(250, e -> {
+            LOGGER.info("Updating");
+            com.codahale.metrics.Timer.Context time = READ.time();
+            byte[] colors = redisStore.getRgbImage();
+            time.stop();
+            boardCanvas.paintColors(colors);
         }).start();
     }
 
