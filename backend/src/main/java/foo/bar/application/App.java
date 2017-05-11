@@ -23,7 +23,7 @@ import java.util.EnumSet;
 
 public class App {
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-    private static final String STATIC_FILE_PATH = "/home/backend/static/";
+    private static final String STATIC_FILE_PATH = "/home/frontend/";
 
     public static void main(String[] args) throws Exception {
         Server server = new Server();
