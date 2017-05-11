@@ -31,10 +31,16 @@ public class UpdateBatching extends Thread {
 
     public static UpdateBatching getInstance() {
         if (instance == null) {
+            startInstance();
+        }
+        return instance;
+    }
+
+    private static synchronized void startInstance() {
+        if (instance == null) {
             instance = new UpdateBatching();
             instance.start();
         }
-        return instance;
     }
 
     public void addUpdate(Pixel update) {
