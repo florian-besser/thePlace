@@ -26,6 +26,7 @@ task(distZip, type: Zip, dependsOn: buildFrontend) {
     from 'browser/build'
     baseName = 'frontend'
 }
+build.dependsOn distZip
 
 artifacts {
     archives distZip
