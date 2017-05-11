@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.URLConnection;
 import java.util.concurrent.TimeUnit;
 
 public class Monitoring {
@@ -31,7 +33,10 @@ public class Monitoring {
 
     private static void initGraphiteReporting() {
         try {
-            final Graphite graphite = new Graphite(new InetSocketAddress("localhost", 2003));
+            String graphiteHost = "localhost";
+            int port = 2003;
+            new Socket(graphiteHost, port).close(); // test if connection is available
+            final Graphite graphite = new Graphite(new InetSocketAddress(graphiteHost, port));
             final GraphiteReporter graphiteReporter = GraphiteReporter.forRegistry(registry)
                     .prefixedWith("place")
                     .convertRatesTo(TimeUnit.SECONDS)
