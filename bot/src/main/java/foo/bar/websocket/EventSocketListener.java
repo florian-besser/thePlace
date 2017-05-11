@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class EventSocketListener extends EventSocketCounter {
-    List<Pixel> setPixels = new ArrayList<>();
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final CollectionType javatype = mapper.getTypeFactory().constructCollectionType(List.class, Pixel.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final CollectionType javatype = MAPPER.getTypeFactory().constructCollectionType(List.class, Pixel.class);
     private final Consumer<List<Pixel>> listener;
+    List<Pixel> setPixels = new ArrayList<>();
 
     public EventSocketListener(Consumer<List<Pixel>> listener) {
         this.listener = listener;
@@ -31,7 +31,7 @@ public class EventSocketListener extends EventSocketCounter {
 
     private List<Pixel> deserialize(String json) {
         try {
-            return mapper.readValue(json, javatype);
+            return MAPPER.readValue(json, javatype);
         } catch (IOException e) {
             throw new RuntimeException("Error wile converting String to Pixel.", e);
         }

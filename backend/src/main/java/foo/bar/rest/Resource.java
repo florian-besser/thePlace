@@ -23,8 +23,8 @@ import java.util.Set;
 
 @Path("thePlace")
 public class Resource {
+    public static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
-
     private final RedisStore redisStore = new RedisStore();
 
     @GET
@@ -111,9 +111,8 @@ public class Resource {
     }
 
     private String serialize(Pixel toSet) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(toSet);
+            return MAPPER.writeValueAsString(toSet);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error wile converting Pixel to String.", e);
         }

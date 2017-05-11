@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 public class MessageReceiver extends DefaultConsumer {
+    public static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
-
     private final Timer receivedPixel = Monitoring.registry.timer("rabbit.receivedPixel");
 
     /**
@@ -37,8 +37,7 @@ public class MessageReceiver extends DefaultConsumer {
             String message = new String(body, "UTF-8");
             LOGGER.debug("Received '" + envelope.getRoutingKey() + "':'" + message + "'");
 
-            ObjectMapper mapper = new ObjectMapper();
-            Pixel pixel = mapper.readValue(message, Pixel.class);
+            Pixel pixel = MAPPER.readValue(message, Pixel.class);
 
             // Update board
             BoardHolder.getInstance().setPixel(pixel);

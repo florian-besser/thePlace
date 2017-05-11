@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class UpdateBatching extends Thread {
 
+    public static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
     private static final int MAX_UPDATES_PER_SECOND = 5;
     private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
@@ -75,10 +76,9 @@ public class UpdateBatching extends Thread {
     }
 
     private String serialize(Object o) {
-        ObjectMapper mapper = new ObjectMapper();
         String toSetStr;
         try {
-            toSetStr = mapper.writeValueAsString(o);
+            toSetStr = MAPPER.writeValueAsString(o);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error wile converting Pixel to String.", e);
         }
