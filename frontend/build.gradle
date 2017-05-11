@@ -1,3 +1,4 @@
+apply plugin: 'base'
 
 task(install, type:Exec) {
     workingDir 'browser'
@@ -10,7 +11,7 @@ task(install, type:Exec) {
     }
 }
 
-task(build, type:Exec, dependsOn: install) {
+task(buildFrontend, type:Exec, dependsOn: install) {
     workingDir 'browser'
 
     //on linux
@@ -21,11 +22,11 @@ task(build, type:Exec, dependsOn: install) {
     }
 }
 
-task(buildDocker, type:Exec, dependsOn: build) {
-    //on linux
-    commandLine "docker", "build", ".", "-t", "192.168.2.136:5000/frontend"
-    //extension method stopTomcat.output() can be used to obtain the output:
-    ext.output = {
-        return standardOutput.toString()
-    }
+task(distZip, type: Zip, dependsOn: buildFrontend) {
+    from 'browser/build'
+    baseName = 'frontend'
+}
+
+artifacts {
+    archives distZip
 }
