@@ -1,6 +1,7 @@
 package foo.bar.websocket;
 
 import foo.bar.RandomBot;
+import foo.bar.model.Pixel;
 import foo.bar.util.EventualExecutor;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
@@ -10,8 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import static java.net.URI.create;
 
@@ -35,11 +38,11 @@ public class WebsocketFactory {
         return socket;
     }
 
-    public static EventSocketListener getListenerInstance() throws Exception {
+    public static EventSocketListener getListenerInstance(Consumer<List<Pixel>> listener) throws Exception {
         startClientIfNecessary();
 
         // The socket that receives events
-        EventSocketListener socket = new EventSocketListener();
+        EventSocketListener socket = new EventSocketListener(listener);
         EventualExecutor<WebSocketAdapter, Session> exec = new EventualExecutor<>();
         Session session = exec.tryExecute(WebsocketFactory::getSession, socket);
 

@@ -19,9 +19,9 @@ public class RedisStore {
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getRedisTargetHost());
     public static int BYTES_PER_COLOR = 3;
-    private final Timer setPixel = Monitoring.registry.timer("redis.setPixel");
-    private final Timer tryToSetPixel = Monitoring.registry.timer("redis.tryToSetPixel");
-    private final Timer readBoard = Monitoring.registry.timer("redis.getboard");
+    private static final Timer setPixel = Monitoring.registry.timer("redis.setPixel");
+    private static final Timer tryToSetPixel = Monitoring.registry.timer("redis.tryToSetPixel");
+    private static final Timer readBoard = Monitoring.registry.timer("redis.getboard");
 
     public RedisStore() {
     }

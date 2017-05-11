@@ -55,4 +55,9 @@ public class SimpleColor {
         }
         return ints;
     }
+
+    public int getAsRgbInt() {
+        int[] asIntArray = getAsIntArray();
+        return asIntArray[0] << 16 | asIntArray[1] << 8 | asIntArray[2];
+    }
 }
