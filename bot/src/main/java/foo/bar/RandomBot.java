@@ -32,7 +32,7 @@ public class RandomBot {
     private static Client client = ClientBuilder.newClient(new ClientConfig().register(LoggingFeature.class));
 
     public static void main(String[] args) throws Exception {
-        EventSocketListener listener = WebsocketFactory.getListenerInstance();
+        EventSocketListener listener = WebsocketFactory.getListenerInstance(null);
 
         LOGGER.info("Reading initial board");
         Board originalBoard = getBoard();
@@ -48,7 +48,7 @@ public class RandomBot {
         int xMax = colors[0].length;
         int yMax = colors.length;
 
-        List<Thread> threads = PixelPutterFactory.IMAGE.createPixelPutters(config, xMax, yMax, "lena.jpg");
+        List<Thread> threads = PixelPutterFactory.RANDOM.createPixelPutters(config, xMax, yMax, "lena.jpg");
 
         // Await
         for (Thread t : threads) {

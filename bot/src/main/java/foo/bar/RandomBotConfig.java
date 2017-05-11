@@ -17,7 +17,7 @@ public enum RandomBotConfig {
 
     UI_STRESS(
             1_000_000,
-            10,
+            3,
             100,
             10
     ),
