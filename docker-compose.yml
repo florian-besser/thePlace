@@ -32,7 +32,7 @@ services:
      TARGET_HOST_RABBITMQ: rabbitmq
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
       restart_policy:
         condition: on-failure
     logging:
@@ -40,6 +40,22 @@ services:
       options:
         gelf-address: udp://127.0.0.1:12201
         tag: backend
+  frontend:
+    image: "192.168.2.136:5000/frontend"
+    ports:
+     - 80
+    environment:
+     TARGET_HOST_BACKEND: backend
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: frontend
   bot:
     image: "192.168.2.136:5000/bot"
     environment:
@@ -47,7 +63,7 @@ services:
      BOT_CONFIG: QUICK_TEST
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 10
       restart_policy:
         condition: on-failure
     logging:
