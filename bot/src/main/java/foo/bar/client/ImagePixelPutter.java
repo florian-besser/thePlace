@@ -7,18 +7,18 @@ import foo.bar.model.SimpleColor;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
 
 public class ImagePixelPutter extends PixelPutter {
 
-    private BufferedImage bufferedImage;
     int x;
     int y = 0;
     int xEnd;
     int xStart;
+    int yEnd;
+    private BufferedImage bufferedImage;
 
 
     public ImagePixelPutter(RandomBotConfig config, int id, int xMax, int yMax, String imageName) throws IOException {
@@ -31,6 +31,7 @@ public class ImagePixelPutter extends PixelPutter {
         xStart = Math.max(id * width - 1, 0);
         x = xStart;
         xEnd = Math.min((id + 1) * width + 1, xMax);
+        yEnd = yMax;
     }
 
     @Override
@@ -39,6 +40,10 @@ public class ImagePixelPutter extends PixelPutter {
         x++;
         if (x == xEnd) {
             y += 1;
+            x = xStart;
+        }
+        if (y == yEnd) {
+            y = 0;
             x = xStart;
         }
         return pixel;

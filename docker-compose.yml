@@ -32,7 +32,7 @@ services:
      TARGET_HOST_RABBITMQ: rabbitmq
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
     logging:
@@ -45,9 +45,10 @@ services:
     environment:
      TARGET_HOST_BACKEND: backend
      BOT_CONFIG: INFINITE
+     BOT_PIXEL_PUTTER_CONFIG: LENA
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
     logging:

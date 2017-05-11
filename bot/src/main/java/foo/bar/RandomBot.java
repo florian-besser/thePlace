@@ -48,7 +48,8 @@ public class RandomBot {
         int xMax = colors[0].length;
         int yMax = colors.length;
 
-        List<Thread> threads = PixelPutterFactory.RANDOM.createPixelPutters(config, xMax, yMax, "lena.jpg");
+        PixelPutterFactory pixelPutterFactory = PixelPutterFactory.forValue(Config.getBotPixelPutterConfig());
+        List<Thread> threads = pixelPutterFactory.createPixelPutters(config, xMax, yMax, "lena.jpg");
 
         // Await
         for (Thread t : threads) {
