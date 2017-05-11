@@ -29,12 +29,3 @@ task(buildDocker, type:Exec, dependsOn: build) {
         return standardOutput.toString()
     }
 }
-
-task(pushDocker, type:Exec, dependsOn: buildDocker) {
-    //on linux
-    commandLine "docker", "push", "192.168.2.136:5000/frontend"
-    //extension method stopTomcat.output() can be used to obtain the output:
-    ext.output = {
-        return standardOutput.toString()
-    }
-}

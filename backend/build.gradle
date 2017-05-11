@@ -8,6 +8,7 @@ repositories {
 }
 
 dependencies {
+    build project(':frontend')
     compile project(':model')
 
     //Basic Jetty
