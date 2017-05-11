@@ -56,3 +56,20 @@ services:
       options:
         gelf-address: udp://127.0.0.1:12201
         tag: bot
+  proxy:
+    image: "192.168.2.136:5000/proxy"
+    ports:
+     - 80
+    environment:
+      TARGET_HOST_BACKEND: backend
+      TARGET_HOST_FRONTEND: frontend
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    logging:
+      driver: gelf
+      options:
+        gelf-address: udp://127.0.0.1:12201
+        tag: bot
