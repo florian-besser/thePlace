@@ -32,7 +32,7 @@ services:
      TARGET_HOST_RABBITMQ: rabbitmq
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 3
       restart_policy:
         condition: on-failure
     logging:
@@ -48,7 +48,7 @@ services:
      TARGET_HOST_BACKEND: backend
     deploy:
       mode: replicated
-      replicas: 2
+      replicas: 3
       restart_policy:
         condition: on-failure
     logging:
@@ -60,10 +60,10 @@ services:
     image: "192.168.2.136:5000/bot"
     environment:
      TARGET_HOST_BACKEND: backend
-     BOT_CONFIG: QUICK_TEST
+     BOT_CONFIG: INFINITE
     deploy:
       mode: replicated
-      replicas: 10
+      replicas: 3
       restart_policy:
         condition: on-failure
     logging:
