@@ -16,24 +16,19 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class UpdateBatching extends Thread {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
+    private static final int MAX_UPDATES_PER_SECOND = 5;
+    private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
+    private static UpdateBatching instance = null;
     private final Timer updateTime = Monitoring.registry.timer("ws.update.time");
     private final Meter updateCount = Monitoring.registry.meter("ws.update.count");
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateBatching.class);
-
     private final ConcurrentLinkedDeque<Pixel> updatesToSend = new ConcurrentLinkedDeque<>();
-
-    private static final int MAX_UPDATES_PER_SECOND = 2;
-
-    private static RateLimiter throttle = RateLimiter.create(MAX_UPDATES_PER_SECOND);
-
-    private static UpdateBatching instance = null;
 
     private UpdateBatching() {
         setDaemon(true);
     }
 
-    public static final UpdateBatching getInstance() {
+    public static UpdateBatching getInstance() {
         if (instance == null) {
             instance = new UpdateBatching();
             instance.start();
