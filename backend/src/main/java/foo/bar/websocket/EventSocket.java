@@ -43,7 +43,7 @@ public class EventSocket extends WebSocketAdapter
 
     public void sendMessage(String text) {
         LOGGER.debug("Sending message: " + text);
-        Future<Void> voidFuture = getRemote().sendStringByFuture(text);
+        Future<Void> voidFuture = sendMessageAsync(text);
         //Do something
         try {
             voidFuture.get();
@@ -51,5 +51,9 @@ public class EventSocket extends WebSocketAdapter
             LOGGER.error("Failed to send message: " + text, e);
         }
         LOGGER.debug("Sent message: " + text);
+    }
+
+    public Future<Void> sendMessageAsync(String text) {
+        return getRemote().sendStringByFuture(text);
     }
 }

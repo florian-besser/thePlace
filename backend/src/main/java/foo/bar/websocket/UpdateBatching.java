@@ -11,10 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class UpdateBatching extends Thread {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private final Timer updateTime = Monitoring.registry.timer("ws.update.time");
     private final Meter updateCount = Monitoring.registry.meter("ws.update.count");
@@ -62,7 +68,16 @@ public class UpdateBatching extends Thread {
                 ArrayList<EventSocket> eventSockets = new ArrayList<>();
                 eventSockets.addAll(websockets);
                 LOGGER.info("Sending to all websockets: " + toSetStr);
-                websockets.parallelStream().forEach(eventSocket -> eventSocket.sendMessage(toSetStr));
+                List<Future<Void>> futures = websockets.stream()
+                        .map(eventSocket -> eventSocket.sendMessageAsync(toSetStr))
+                        .collect(Collectors.toList());
+                futures.forEach(future -> {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.warn("Could not send message to client", e);
+                    }
+                });
             } finally {
                 time.stop();
             }
@@ -83,7 +98,6 @@ public class UpdateBatching extends Thread {
     }
 
     private String serialize(Object o) {
-        ObjectMapper mapper = new ObjectMapper();
         String toSetStr;
         try {
             toSetStr = mapper.writeValueAsString(o);
