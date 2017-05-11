@@ -7,6 +7,7 @@ import persistence.RedisStore;
 
 public class BoardHolder {
     private static Board THE_BOARD;
+    public static final BoardDimensions BOARD_DIMENSIONS = new BoardDimensions(500, 500);
 
     public static Board getInstance() {
         if (THE_BOARD == null) {
@@ -19,12 +20,11 @@ public class BoardHolder {
         if (THE_BOARD != null) {
             return;
         }
-        BoardDimensions boardDimensions = new BoardDimensions(800, 800);
 
         // Read from Redis
         RedisStore redisStore = new RedisStore();
-        redisStore.resetBoard(boardDimensions);
-        SimpleColor[][] boardColors = redisStore.getBoardColors(boardDimensions);
+        redisStore.resetBoard(BOARD_DIMENSIONS);
+        SimpleColor[][] boardColors = redisStore.getBoardColors(BOARD_DIMENSIONS);
 
         THE_BOARD = new Board(boardColors);
     }

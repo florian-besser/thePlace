@@ -46,4 +46,13 @@ public class SimpleColor {
                 "color='" + color + '\'' +
                 '}';
     }
+
+    public int[] getAsIntArray() {
+        int[] ints = new int[3];
+        for (int i = 0; i < 3; i++) {
+            int i1 = i * 2 + 1;
+            ints[i] = Integer.parseInt(color.substring(i1, i1 + 2), 16);
+        }
+        return ints;
+    }
 }

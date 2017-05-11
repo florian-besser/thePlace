@@ -35,7 +35,8 @@ public class Monitoring {
         try {
             String graphiteHost = "localhost";
             int port = 2003;
-            new Socket(graphiteHost, port).close(); // test if connection is available
+            // test if connection is available
+            new Socket(graphiteHost, port).close();
             final Graphite graphite = new Graphite(new InetSocketAddress(graphiteHost, port));
             final GraphiteReporter graphiteReporter = GraphiteReporter.forRegistry(registry)
                     .prefixedWith("place")

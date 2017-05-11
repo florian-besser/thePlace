@@ -1,0 +1,11 @@
+drawing each pixel in any case:
+min=551.332096, max=1130.7884729999998
+
+drawing each pixel onto an image and draw it:
+min=122.81330799999999, max=356.238743, mean=186.27806747026722
+
+draw pixel onto raster with rgb components
+min=80.12506599999999, max=175.008818, mean=116.3541110836075
+
+reuse bufferedimage, convert byte[] to int[] and set all pixels directly onto raster:
+min=2.5460409999999998, max=62.651112999999995, mean=7.35565521422946

@@ -19,8 +19,9 @@ public class RedisStore {
 
     private static final JedisPool pool = new JedisPool(new JedisPoolConfig(), Config.getRedisTargetHost());
     public static int BYTES_PER_COLOR = 3;
-    private final Timer setPixel = Monitoring.registry.timer("setPixel");
-    private final Timer tryToSetPixel = Monitoring.registry.timer("tryToSetPixel");
+    private final Timer setPixel = Monitoring.registry.timer("redis.setPixel");
+    private final Timer tryToSetPixel = Monitoring.registry.timer("redis.tryToSetPixel");
+    private final Timer readBoard = Monitoring.registry.timer("redis.getboard");
 
     public RedisStore() {
     }
@@ -62,26 +63,33 @@ public class RedisStore {
         return dimensions.getXMaximum() * dimensions.getYMaximum() * RedisStore.BYTES_PER_COLOR;
     }
 
-    public SimpleColor[][] getBoardColors(BoardDimensions boardDimensions) {
+    public byte[] getRgbImage() {
+        Timer.Context timeRead = readBoard.time();
         try (Jedis jedis = pool.getResource()) {
-            byte[] colorsInBytes = jedis.get(encode("colors"));
-            int yMax = boardDimensions.getYMaximum();
-            int xMax = boardDimensions.getXMaximum();
-            SimpleColor[][] colors = new SimpleColor[yMax][xMax];
-            for (int y = 0; y < yMax; y++) {
-                for (int x = 0; x < xMax; x++) {
-                    int offset = calculateOffset(boardDimensions, x, y);
-                    int red = colorsInBytes[offset] & 0xff;
-                    int green = colorsInBytes[offset + 1] & 0xff;
-                    int blue = colorsInBytes[offset + 2] & 0xff;
-                    String hex = String.format("#%02x%02x%02x", red, green, blue);
-
-                    SimpleColor color = new SimpleColor(hex);
-                    colors[y][x] = color;
-                }
-            }
-            return colors;
+            return jedis.get(encode("colors"));
+        } finally {
+            timeRead.stop();
         }
+    }
+
+    public SimpleColor[][] getBoardColors(BoardDimensions boardDimensions) {
+        byte[] colorsInBytes = getRgbImage();
+        int yMax = boardDimensions.getYMaximum();
+        int xMax = boardDimensions.getXMaximum();
+        SimpleColor[][] colors = new SimpleColor[yMax][xMax];
+        for (int y = 0; y < yMax; y++) {
+            for (int x = 0; x < xMax; x++) {
+                int offset = calculateOffset(boardDimensions, x, y);
+                int red = colorsInBytes[offset] & 0xff;
+                int green = colorsInBytes[offset + 1] & 0xff;
+                int blue = colorsInBytes[offset + 2] & 0xff;
+                String hex = String.format("#%02x%02x%02x", red, green, blue);
+
+                SimpleColor color = new SimpleColor(hex);
+                colors[y][x] = color;
+            }
+        }
+        return colors;
     }
 
     public boolean tryToSetPixel(String userId) {
@@ -100,4 +108,7 @@ public class RedisStore {
         }
     }
 
+    public static JedisPool getPool() {
+        return pool;
+    }
 }
