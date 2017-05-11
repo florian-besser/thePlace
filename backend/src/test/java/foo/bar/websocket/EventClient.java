@@ -13,6 +13,7 @@ public class EventClient
         URI uri = URI.create("ws://localhost:2222/events/");
 
         WebSocketClient client = new WebSocketClient();
+        client.setMaxTextMessageBufferSize(10 * 1024 * 1024);
         try
         {
             try

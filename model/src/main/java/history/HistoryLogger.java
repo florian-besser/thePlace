@@ -8,6 +8,6 @@ public class HistoryLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger(HistoryLogger.class);
 
     public static void logPixelSet(Integer x, Integer y, SimpleColor color) {
-        LOGGER.info(String.format("%d/%d;%s", x, y, color.getColor()));
+        LOGGER.debug(String.format("%d/%d;%s", x, y, color.getColor()));
     }
 }

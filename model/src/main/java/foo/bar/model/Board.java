@@ -29,7 +29,7 @@ public class Board {
     }
 
     public void setPixel(Pixel toSet) {
-        LOGGER.info("Updating Pixel LOCALLY at " + toSet.getX() + " " + toSet.getY() +
+        LOGGER.debug("Updating Pixel LOCALLY at " + toSet.getX() + " " + toSet.getY() +
                 " with Color " + toSet.getColor());
         HistoryLogger.logPixelSet(toSet.getX(), toSet.getY(), toSet.getColor());
 

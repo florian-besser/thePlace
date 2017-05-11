@@ -99,7 +99,7 @@ public class Resource {
                     build();
         }
 
-        LOGGER.info("Updating Pixel IN REDIS at " + x + " " + y +
+        LOGGER.debug("Updating Pixel IN REDIS at " + x + " " + y +
                 " with Color " + body.getColor() + " for user " + body.getUser());
         BoardDimensions dimensions = new BoardDimensions(xMax, yMax);
         SimpleColor color = new SimpleColor(body.getColor());

@@ -12,6 +12,7 @@ public class EventSocketCounter extends WebSocketAdapter {
     @Override
     public void onWebSocketConnect(Session sess) {
         super.onWebSocketConnect(sess);
+        sess.getPolicy().setMaxTextMessageSize(10 * 1024 * 1024);
         LOGGER.debug("Socket Connected: " + sess);
     }
 
