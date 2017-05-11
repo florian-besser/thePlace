@@ -60,6 +60,14 @@ public class Resource {
         return BoardHolder.getInstance();
     }
 
+    @GET
+    @Path("rawrgb")
+    @Timed
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public byte[] rawrgb() {
+        return redisStore.getRgbImage();
+    }
+
     @PUT
     @Path("place/{x}/{y}")
     @Consumes(MediaType.APPLICATION_JSON)
