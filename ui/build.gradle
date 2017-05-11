@@ -7,5 +7,5 @@ repositories {
 dependencies {
     compile project(':backend')
     compile project(':bot')
-
+    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.0'
 }

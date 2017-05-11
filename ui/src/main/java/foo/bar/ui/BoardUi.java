@@ -8,6 +8,9 @@ import foo.bar.config.Config;
 import foo.bar.model.Pixel;
 import foo.bar.monitoring.Monitoring;
 import foo.bar.websocket.WebsocketFactory;
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
@@ -40,6 +43,7 @@ public class BoardUi {
     private final RedisStore redisStore = new RedisStore();
     public static final com.codahale.metrics.Timer DRAW = registry.timer("draw");
     public static final com.codahale.metrics.Timer READ = registry.timer("read");
+    private BoardCanvasDiff boardCanvasDiff;
 
     public static void main(String[] args) throws Exception {
         final Slf4jReporter slf4jReporter = Slf4jReporter.forRegistry(registry)
@@ -57,23 +61,25 @@ public class BoardUi {
 
         boardCanvasRedis = new BoardCanvas();
         boardCanvasWS = new BoardCanvas();
-        BorderLayout borderLayout = new BorderLayout();
-        jFrame.setLayout(borderLayout);
-        JSplitPane jSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        jSplitPane.setLeftComponent(boardCanvasRedis);
-        jSplitPane.setRightComponent(boardCanvasWS);
-        jFrame.add(jSplitPane);
+        boardCanvasDiff = new BoardCanvasDiff(boardCanvasRedis, boardCanvasWS);
+        jFrame.setLayout(new MigLayout(new LC().wrapAfter(3)));
+        jFrame.add(new JLabel("Redis"), new CC().growX());
+        jFrame.add(new JLabel("Websocket"), new CC().growX());
+        jFrame.add(new JLabel("Diff"), new CC().growX());
+        jFrame.add(boardCanvasRedis, new CC().grow());
+        jFrame.add(boardCanvasWS, new CC().grow());
+        jFrame.add(boardCanvasDiff, new CC().grow());
         jFrame.setTitle("Redis vs Websocket Content");
         jFrame.setSize(1000, 1000);
         jFrame.setVisible(true);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jSplitPane.setDividerLocation(0.5);
         new Timer(500, e -> {
             LOGGER.info("Updating");
             com.codahale.metrics.Timer.Context time = READ.time();
             byte[] colors = redisStore.getRgbImage();
             time.stop();
             boardCanvasRedis.paintColors(colors);
+            boardCanvasDiff.repaint();
         }).start();
 
         SwingUtilities.invokeLater(() -> {
@@ -111,9 +117,12 @@ class BoardCanvas extends Canvas {
     }
 
     @Override
+    public Dimension getPreferredSize() {
+        return getParent().getSize();
+    }
+
+    @Override
     public void paint(Graphics g) {
-        super.paint(g);
-//        g.drawImage(bufferedImage, 0, 0, null);
         g.drawImage(bufferedImage, 0, 0, getWidth(), getHeight(), Color.black, null);
     }
 
@@ -141,5 +150,9 @@ class BoardCanvas extends Canvas {
             savedPixels.addAll(pixels);
         }
         repaint();
+    }
+
+    public BufferedImage getBufferedImage() {
+        return bufferedImage;
     }
 }
