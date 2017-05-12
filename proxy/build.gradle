@@ -1,8 +1,4 @@
 task(build, type:Exec) {
-
-}
-
-task(buildDocker, type:Exec, dependsOn: build) {
     //on linux
     commandLine "docker", "build", ".", "-t", "192.168.2.136:5000/proxy"
     //extension method stopTomcat.output() can be used to obtain the output:
@@ -11,7 +7,7 @@ task(buildDocker, type:Exec, dependsOn: build) {
     }
 }
 
-task(pushDocker, type:Exec, dependsOn: buildDocker) {
+task(pushDocker, type:Exec, dependsOn: build) {
     //on linux
     commandLine "docker", "push", "192.168.2.136:5000/proxy"
     //extension method stopTomcat.output() can be used to obtain the output:

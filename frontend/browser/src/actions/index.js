@@ -3,8 +3,9 @@ import parse from 'url-parse';
 import * as ActionType from "./actionTypes";
 
 const WINDOW_LOCATION = parse(window.location);
-export const API_PORT = process.env.NODE_ENV === 'develop' ? 2222 : WINDOW_LOCATION.port;
-export const API_HOST = WINDOW_LOCATION.hostname + ':' + API_PORT;
+const API_PORT = process.env.NODE_ENV === 'develop' ? 2222 : WINDOW_LOCATION.port;
+const BASE_PATH = process.env.NODE_ENV === 'develop' ? '' : '/api';
+export const API_HOST = WINDOW_LOCATION.hostname + ':' + API_PORT + BASE_PATH;
 const REST_API = '//' + API_HOST + '/rest/thePlace';
 const request_options = {};
 

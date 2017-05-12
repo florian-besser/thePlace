@@ -74,7 +74,5 @@ public class App {
         } finally {
             server.destroy();
         }
-
-
     }
 }
