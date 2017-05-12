@@ -71,7 +71,7 @@ public class UpdateBatching extends Thread {
                 if (debugEnabled) {
                     LOGGER.debug("Sending to all websockets: " + toSetStr);
                 }
-                List<Future<Void>> futures = websockets.stream()
+                List<Future<Void>> futures = eventSockets.stream()
                         .map(eventSocket -> eventSocket.sendMessageAsync(toSetStr))
                         .collect(Collectors.toList());
                 futures.forEach(future -> {
