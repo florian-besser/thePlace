@@ -22,12 +22,21 @@ task(buildFrontend, type:Exec, dependsOn: install) {
     }
 }
 
-task(distZip, type: Zip, dependsOn: buildFrontend) {
-    from 'browser/build'
-    baseName = 'frontend'
+task(buildDocker, type:Exec, dependsOn: buildFrontend) {
+    //on linux
+    commandLine "docker", "build", ".", "-t", "192.168.2.136:5000/frontend"
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
 }
-build.dependsOn distZip
+build.dependsOn buildDocker
 
-artifacts {
-    archives distZip
+task(pushDocker, type:Exec, dependsOn: buildDocker) {
+    //on linux
+    commandLine "docker", "push", "192.168.2.136:5000/frontend"
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
 }
