@@ -32,8 +32,8 @@ public enum RandomBotConfig {
     INFINITE(
             Integer.MAX_VALUE,
             1,
-            25,
-            10_000
+            15,
+            5_000
     ),
 
     INFINITE_LOW_POWER(
